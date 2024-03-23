@@ -4,7 +4,7 @@ let { sequelize, Op } = require('../models/index')
 
 let create = async(data) => {
     try {
-        await sequelize.query(`INSERT INTO chats (message, dateTimeSend, sender, receiver)
+        await sequelize.query(`INSERT INTO Chats (message, dateTimeSend, sender, receiver)
         VALUES (:message, :dateTimeSend, :sender, :receiver)`, {
             replacements :{
                 message : data.message,
@@ -60,7 +60,7 @@ let deleteById = async(id) => {
 
 let getApiChatBetweenUsers = (userId, idChat) => {
     try {
-        let datas = sequelize.query(`SELECT * FROM chats WHERE sender = :sender and receiver = :receiver OR sender = :receiver AND receiver = :sender ORDER BY dateTimeSend ASC`, {
+        let datas = sequelize.query(`SELECT * FROM Chats WHERE sender = :sender and receiver = :receiver OR sender = :receiver AND receiver = :sender ORDER BY dateTimeSend ASC`, {
             replacements : {
                 sender : userId,
                 receiver : idChat

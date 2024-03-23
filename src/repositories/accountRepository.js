@@ -51,7 +51,7 @@ let deleteById = async(id) => {
 
 let login = async(phone, password) =>{
     try {
-        let data = await sequelize.query("SELECT u.id, u.name, u.gender, u.dob, u.email, a.phone, u.image, u.background FROM accounts AS a INNER JOIN users AS u ON a.`user` = u.id WHERE a.phone = :phone AND a.`password` = :password", {
+        let data = await sequelize.query("SELECT u.id, u.name, u.gender, u.dob, u.email, a.phone, u.image, u.background FROM Accounts AS a INNER JOIN Users AS u ON a.`user` = u.id WHERE a.phone = :phone AND a.`password` = :password", {
             replacements : {
                 phone : '0329623380',
                 password : '123456789'

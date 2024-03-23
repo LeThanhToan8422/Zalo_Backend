@@ -1,23 +1,23 @@
 {
   "development": {
-    "username": "root",
+    "username": "admin",
     "password": "sapassword",
     "database": "zalo",
-    "host": "127.0.0.1",
+    "host": "zalo.cnkw88ec2q60.ap-southeast-1.rds.amazonaws.com",
     "dialect": "mariadb"
   },
   "test": {
-    "username": "root",
+    "username": "admin",
     "password": "sapassword",
     "database": "zalo",
-    "host": "127.0.0.1",
+    "host": "zalo.cnkw88ec2q60.ap-southeast-1.rds.amazonaws.com",
     "dialect": "mariadb"
   },
   "production": {
-    "username": "root",
+    "username": "admin",
     "password": "sapassword",
     "database": "zalo",
-    "host": "127.0.0.1",
+    "host": "zalo.cnkw88ec2q60.ap-southeast-1.rds.amazonaws.com",
     "dialect": "mariadb"
   }
 }

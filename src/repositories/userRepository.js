@@ -13,7 +13,7 @@ let create = async(data) => {
 
 let update = async(data) => {
     try {
-        await sequelize.query(`UPDATE users
+        await sequelize.query(`UPDATE Users
         SET name = :name, gender = :gender, dob = :dob
         WHERE id = :id`, {
             replacements : {
@@ -43,7 +43,7 @@ let findAll = async() => {
 
 let findById = async(id) => {
     try {
-        let data = await sequelize.query(`SELECT u.id, u.name, u.gender, u.dob, a.phone, u.image, u.background FROM users AS u INNER JOIN accounts AS a ON u.id = a.user WHERE u.id = :id`,{
+        let data = await sequelize.query(`SELECT u.id, u.name, u.gender, u.dob, a.phone, u.image, u.background FROM Users AS u INNER JOIN Accounts AS a ON u.id = a.user WHERE u.id = :id`,{
             replacements : {
                 id : id
             },
@@ -71,8 +71,8 @@ let deleteById = async(id) => {
 let getApiChatsByUserId = (id) => {
     try {
         let datas = sequelize.query(`SELECT u.id, u.name, u.gender, u.dob, u.email, u.image, u.background, c.message, c.dateTimeSend, c.receiver, c.sender
-        FROM users AS u INNER JOIN chats as c ON (c.sender = u.id AND c.receiver = :id) OR (c.sender = :id AND c.receiver = u.id)
-        WHERE u.id <> :id AND c.id = ( SELECT MAX(id) FROM chats WHERE (sender = u.id AND receiver = :id) OR (sender = :id AND receiver = u.id))`, {
+        FROM Users AS u INNER JOIN Chats as c ON (c.sender = u.id AND c.receiver = :id) OR (c.sender = :id AND c.receiver = u.id)
+        WHERE u.id <> :id AND c.id = ( SELECT MAX(id) FROM Chats WHERE (sender = u.id AND receiver = :id) OR (sender = :id AND receiver = u.id))`, {
             replacements : {
                 id : id
             },

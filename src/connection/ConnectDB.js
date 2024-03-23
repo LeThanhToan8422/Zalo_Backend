@@ -1,6 +1,6 @@
 const { Sequelize } = require("sequelize");
 
-const sequelize = new Sequelize("zalo", "root", "sapassword", {
+const sequelize = new Sequelize("zalo", "admin", "sapassword", {
   host: "localhost",
   dialect: "mariadb",
 });
