@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "root",
+    "password": "sapassword",
+    "database": "zalo",
+    "host": "127.0.0.1",
+    "dialect": "mariadb"
+  },
+  "test": {
+    "username": "root",
+    "password": "sapassword",
+    "database": "zalo",
+    "host": "127.0.0.1",
+    "dialect": "mariadb"
+  },
+  "production": {
+    "username": "root",
+    "password": "sapassword",
+    "database": "zalo",
+    "host": "127.0.0.1",
+    "dialect": "mariadb"
+  }
+}
