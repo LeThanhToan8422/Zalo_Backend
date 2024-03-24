@@ -1,7 +1,7 @@
 const { Sequelize } = require("sequelize");
 
 const sequelize = new Sequelize("zalo", "admin", "sapassword", {
-  host: "localhost",
+  host: "zalo.cnkw88ec2q60.ap-southeast-1.rds.amazonaws.com",
   dialect: "mariadb",
 });
 
