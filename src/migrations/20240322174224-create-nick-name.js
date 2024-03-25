@@ -2,43 +2,34 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Chats', {
+    await queryInterface.createTable('Nick_Names', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      message: {
+      nickNames: {
         type: Sequelize.STRING
       },
-      dateTimeSend: {
-        type: Sequelize.DATE
-      },
-      sender: {
+      nicknameGiver: {
         type: Sequelize.INTEGER,
         references : {
           model : 'Users',
           key : 'id'
         }
       },
-      receiver: {
+      nicknameRecipient: {
         type: Sequelize.INTEGER,
         references : {
           model : 'Users',
-          key : 'id'
-        }
-      },
-      groupChat: {
-        type: Sequelize.INTEGER,
-        references : {
-          model : 'Group_Chats',
           key : 'id'
         }
       },
     });
+    
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Chats');
+    await queryInterface.dropTable('Nick_Names');
   }
 };

@@ -27,7 +27,7 @@ module.exports = {
       background: {
         type: Sequelize.STRING
       },
-      friends: {
+      relationships: {
         type: Sequelize.JSON
       }
     });

@@ -4,10 +4,10 @@ let { sequelize, Op } = require('../models/index')
 
 let create = async(data) => {
     try {
-        await sequelize.query(`INSERT INTO Chats (message, dateTimeSend, sender, receiver)
-        VALUES (:message, :dateTimeSend, :sender, :receiver)`, {
+        await sequelize.query(`INSERT INTO Chat_Files (url, dateTimeSend, sender, receiver)
+        VALUES (:url, :dateTimeSend, :sender, :receiver)`, {
             replacements :{
-                message : data.message,
+                url : data.url,
                 dateTimeSend : new Date(),
                 sender : data.sender,
                 receiver : data.receiver
@@ -22,8 +22,8 @@ let create = async(data) => {
 
 let findAll = async() => {
     try {
-        let datas = await db.Chat.findAll({
-            attributes : ['id', 'message', 'dateTimeSend', 'sender', 'receiver']
+        let datas = await db.ChatFile.findAll({
+            attributes : ['id', 'url', 'dateTimeSend', 'sender', 'receiver']
         })
         return datas
     } catch (error) {
@@ -33,8 +33,8 @@ let findAll = async() => {
 
 let findById = async(id) => {
     try {
-        let data = await db.Chat.findOne({
-            attributes : ['id', 'message', 'dateTimeSend', 'sender', 'receiver'],
+        let data = await db.ChatFile.findOne({
+            attributes : ['id', 'url', 'dateTimeSend', 'sender', 'receiver'],
             where : {
                 id : id
             }
@@ -47,7 +47,7 @@ let findById = async(id) => {
 
 let deleteById = async(id) => {
     try {
-        await db.Chat.destroy({
+        await db.ChatFile.destroy({
             where : {
                 id : id
             }
@@ -58,26 +58,9 @@ let deleteById = async(id) => {
     }
 }
 
-let getApiChatBetweenUsers = (userId, idChat) => {
-    try {
-        let datas = sequelize.query(`SELECT * FROM Chats WHERE sender = :sender AND receiver = :receiver OR sender = :receiver AND receiver = :sender UNION ALL SELECT * FROM Chat_Files WHERE sender = :sender AND receiver = :receiver OR sender = :receiver AND receiver = :sender ORDER BY dateTimeSend ASC
-        `, {
-            replacements : {
-                sender : userId,
-                receiver : idChat
-            },
-            type : QueryTypes.SELECT
-        })
-        return datas
-    } catch (error) {
-        throw new Error(`Error : ${error.message}`)
-    }
-}
-
 module.exports = {
     create,
     findAll,
     findById,
     deleteById,
-    getApiChatBetweenUsers
 }
