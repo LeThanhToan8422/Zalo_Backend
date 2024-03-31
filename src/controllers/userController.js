@@ -5,7 +5,8 @@ let {
     findById,
     deleteById,
     getApiChatsByUserId,
-    checkEmail
+    checkEmail,
+    getFriendsByIdAndName
 } = require('../repositories/userRepository')
 
 let createMethod = async(req, res) => {
@@ -43,6 +44,11 @@ let checkEmailMethod = async(req, res) => {
     return res.status(200).json(data)
 }
 
+let getFriendsByIdAndNameMethod = async(req, res) => {
+    let datas = await getFriendsByIdAndName(req.params.id, req.params.name)
+    return res.status(200).json(datas)
+}
+
 module.exports = {
     createMethod,
     updateMethod,
@@ -50,5 +56,6 @@ module.exports = {
     findByIdMethod,
     deleteByIdMethod,
     getApiChatsByUserIdMethod,
-    checkEmailMethod
+    checkEmailMethod,
+    getFriendsByIdAndNameMethod
 }

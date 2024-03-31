@@ -12,8 +12,12 @@ let create = async (data) => {
           gender: data.gender,
           dob: data.dob,
           email: data.email,
-          image: data.image ? data.image : "https://s3-dynamodb-cloudfront-20040331.s3.ap-southeast-1.amazonaws.com/toan.jfif",
-          background: data.background ? data.background : "https://s3-dynamodb-cloudfront-20040331.s3.ap-southeast-1.amazonaws.com/backgroud.jpg",
+          image: data.image
+            ? data.image
+            : "https://s3-dynamodb-cloudfront-20040331.s3.ap-southeast-1.amazonaws.com/toan.jfif",
+          background: data.background
+            ? data.background
+            : "https://s3-dynamodb-cloudfront-20040331.s3.ap-southeast-1.amazonaws.com/backgroud.jpg",
         },
         type: QueryTypes.INSERT,
       }
@@ -132,6 +136,37 @@ let checkEmail = async (email) => {
   }
 };
 
+let getFriendsByIdAndName = async (id, name) => {
+  try {
+    let datas = await sequelize.query(
+      `SELECT u.*
+      FROM Users u
+      JOIN (
+        SELECT JSON_UNQUOTE(friend_id) AS friend_id
+        FROM Users
+        CROSS JOIN JSON_TABLE(
+          relationships,
+          '$.friends[*]' COLUMNS (
+            friend_id VARCHAR(255) PATH '$'
+          )
+        ) AS friends
+        WHERE id = :id
+      ) f ON u.id = CAST(f.friend_id AS INT)
+      WHERE u.name LIKE :name`,
+      {
+        replacements: {
+          id : id,
+          name: `%${name}%`,
+        },
+        type: QueryTypes.SELECT,
+      }
+    );
+    return datas;
+  } catch (error) {
+    return null;
+  }
+};
+
 module.exports = {
   create,
   update,
@@ -140,4 +175,5 @@ module.exports = {
   deleteById,
   getApiChatsByUserId,
   checkEmail,
+  getFriendsByIdAndName,
 };

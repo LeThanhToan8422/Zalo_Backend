@@ -25,7 +25,7 @@ let create = async (data) => {
 let update = async (data) => {
     try {
       await sequelize.query(
-        `UPDATE Account
+        `UPDATE Accounts
           SET phone = :phone, password = :password
           WHERE id = :id`,
         {
