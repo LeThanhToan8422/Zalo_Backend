@@ -7,6 +7,7 @@ let {
     findByIdMethod,
     deleteByIdMethod,
     getApiChatsByUserIdMethod,
+    checkEmailMethod
 } = require('../controllers/userController')
 
 router.get('/users', findAllMethod)
@@ -15,5 +16,6 @@ router.post('/users', upload, createMethod)
 router.put('/users', upload, updateMethod)
 router.delete('/users/:id', deleteByIdMethod)
 router.get('/users/get-chats-by-id/:id', getApiChatsByUserIdMethod)
+router.get('/users/email/:email', checkEmailMethod)
 
 module.exports = router

@@ -1,13 +1,20 @@
 let {
-    createOrUpdate,
+    create,
+    update,
     findAll,
     findById,
     deleteById,
-    login
+    login,
+    checkPhone
 } = require('../repositories/accountRepository')
 
-let createOrUpdateMethod = async(req, res) => {
-    let data = await createOrUpdate(req.body)
+let createMethod = async(req, res) => {
+    let data = await create(req.body)
+    return res.status(200).json(data)
+}
+
+let updateMethod = async(req, res) => {
+    let data = await update(req.body)
     return res.status(200).json(data)
 }
 
@@ -31,11 +38,18 @@ let loginMethod = async(req, res) => {
     return res.status(200).json(data)
 }
 
+let checkPhoneMethod = async(req, res) => {
+    let data = await checkPhone(req.params.phone)
+    return res.status(200).json(data)
+}
+
 
 module.exports = {
-    createOrUpdateMethod,
+    createMethod,
+    updateMethod,
     findAllMethod,
     findByIdMethod,
     deleteByIdMethod,
-    loginMethod
+    loginMethod,
+    checkPhoneMethod
 }
