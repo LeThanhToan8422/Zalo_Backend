@@ -3,7 +3,7 @@ let {
     findAll,
     findById,
     deleteById,
-} = require('../repositories/chatRepository')
+} = require('../repositories/chatFileRepository')
 
 let createMethod = async(req, res) => {
     let data = await create(req.body)

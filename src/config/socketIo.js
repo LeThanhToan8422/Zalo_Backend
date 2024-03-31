@@ -15,6 +15,12 @@ let SocketIo = (httpServer) => {
     ///Handle khi có connect từ client tới
     //console.log("New client connected" + socket.id);
 
+    socket.on(`Client-Register-QR-Code`, async(data) => {
+      if(data.id){
+        io.emit(`Server-Register-QR-Code`, { data: data }); 
+      }
+    });
+
     socket.on(`Client-Chat-Room`, async(data) => {
       if(data.message){
         await chatRepository.create(data)

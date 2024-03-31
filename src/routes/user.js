@@ -19,5 +19,6 @@ router.delete('/users/:id', deleteByIdMethod)
 router.get('/users/get-chats-by-id/:id', getApiChatsByUserIdMethod)
 router.get('/users/email/:email', checkEmailMethod)
 router.get('/users/friends/:id/:name', getFriendsByIdAndNameMethod)
+router.get('/users/friends/:id/', getApiChatsByUserIdMethod)
 
 module.exports = router

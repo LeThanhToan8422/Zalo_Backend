@@ -155,7 +155,7 @@ let getFriendsByIdAndName = async (id, name) => {
       WHERE u.name LIKE :name`,
       {
         replacements: {
-          id : id,
+          id : Number(id),
           name: `%${name}%`,
         },
         type: QueryTypes.SELECT,

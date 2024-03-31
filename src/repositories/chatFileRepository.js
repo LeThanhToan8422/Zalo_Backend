@@ -16,7 +16,7 @@ let create = async(data) => {
         })
         return true
     } catch (error) {
-        throw new Error(`Error : ${error.message}`)
+        return false
     }
 }
 
@@ -27,7 +27,7 @@ let findAll = async() => {
         })
         return datas
     } catch (error) {
-        throw new Error(`Error : ${error.message}`)
+        return null
     }
 }
 
@@ -41,7 +41,7 @@ let findById = async(id) => {
         })
         return data.dataValues
     } catch (error) {
-        throw new Error(`Error : ${error.message}`)
+        return null
     }
 }
 
@@ -54,7 +54,7 @@ let deleteById = async(id) => {
         })
         return true
     } catch (error) {
-        throw new Error(`Error : ${error.message}`)
+        return false
     }
 }
 
