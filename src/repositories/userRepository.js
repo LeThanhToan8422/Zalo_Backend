@@ -52,18 +52,7 @@ let update = async (data) => {
 
 let findAll = async () => {
   try {
-    let datas = await db.User.findAll({
-      attributes: [
-        "id",
-        "name",
-        "gender",
-        "dob",
-        "email",
-        "image",
-        "background",
-        "friends",
-      ],
-    });
+    let datas = await sequelize.query("SELECT * FROM Users", {type : QueryTypes.SELECT})
     return datas;
   } catch (error) {
     return null;

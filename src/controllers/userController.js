@@ -22,7 +22,7 @@ let updateMethod = async(req, res) => {
 
 let findAllMethod = async(req, res) => {
     let datas = await findAll()
-    return res.status(200).json(datas.map(e => e.dataValues))
+    return res.status(200).json(datas)
 }
 
 let findByIdMethod = async(req, res) => {
