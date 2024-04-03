@@ -19,11 +19,15 @@ const FILE_TYPE_MATCH = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   "application/vnd.ms-powerpoint",
   "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   "application/vnd.rar",
   "application/zip",
+  "text/plain",
+  "application/vnd.ms-powerpoint",
+  "application/x-zip-compressed",
 ];
 const uploadFile = async (file) => {
-  const filePath = `${randomString(4)}-${new Date().getTime()}-${
+  const filePath = `${randomString(4)}-${new Date().getTime()}--${
     file?.originalname
   }`;
   if (FILE_TYPE_MATCH.indexOf(file.mimetype) === -1) {
@@ -39,6 +43,7 @@ const uploadFile = async (file) => {
 
   try {
     const data = await s3.upload(uploadParams).promise();
+    console.log(data.Location);
     return data.Location;
   } catch (error) {
     console.error(error);

@@ -113,6 +113,20 @@ let checkPhone = async (phone) => {
   }
 };
 
+let findByUserId = async (id) => {
+  try {
+    let data = await db.Account.findOne({
+      attributes: ["id", "phone", "password", "user"],
+      where: {
+        user: id,
+      },
+    });
+    return data.dataValues;
+  } catch (error) {
+    return null;
+  }
+};
+
 module.exports = {
   create,
   update,
@@ -121,4 +135,5 @@ module.exports = {
   deleteById,
   login,
   checkPhone,
+  findByUserId
 };

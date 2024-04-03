@@ -5,13 +5,13 @@ let { sequelize, Op } = require("../models/index");
 let create = async (data) => {
   try {
     await sequelize.query(
-      `INSERT INTO Users (name,gender,dob,email, image, background) VALUES (:name,:gender,:dob,:email,:image,:background)`,
+      `INSERT INTO Users (name,gender,dob,phone, image, background) VALUES (:name,:gender,:dob,:phone,:image,:background)`,
       {
         replacements: {
           name: data.name,
           gender: data.gender,
           dob: data.dob,
-          email: data.email,
+          phone: data.phone,
           image: data.image
             ? data.image
             : "https://s3-dynamodb-cloudfront-20040331.s3.ap-southeast-1.amazonaws.com/toan.jfif",
@@ -22,7 +22,7 @@ let create = async (data) => {
         type: QueryTypes.INSERT,
       }
     );
-    return await checkEmail(data.email);
+    return await checkPhone(data.phone);
   } catch (error) {
     return null;
   }
@@ -92,7 +92,7 @@ let deleteById = async (id) => {
 let getApiChatsByUserId = (id) => {
   try {
     let datas = sequelize.query(
-      `SELECT u.id, u.name, u.gender, u.dob, u.email, u.image, u.background, c.message, c.dateTimeSend, c.receiver, c.sender
+      `SELECT u.id, u.name, u.gender, u.dob, u.phone, u.image, u.background, c.message, c.dateTimeSend, c.receiver, c.sender
         FROM Users AS u INNER JOIN Chats as c ON (c.sender = u.id AND c.receiver = :id) OR (c.sender = :id AND c.receiver = u.id)
         WHERE u.id <> :id AND c.id = ( SELECT MAX(id) FROM Chats WHERE (sender = u.id AND receiver = :id) OR (sender = :id AND receiver = u.id))`,
       {
@@ -108,13 +108,13 @@ let getApiChatsByUserId = (id) => {
   }
 };
 
-let checkEmail = async (email) => {
+let checkPhone = async (phone) => {
   try {
     let data = await sequelize.query(
-      `SELECT u.id, u.name, u.gender, u.dob, u.image, u.background FROM Users AS u WHERE u.email = :email`,
+      `SELECT u.id, u.name, u.gender, u.dob, u.phone, u.image, u.background FROM Users AS u WHERE u.phone = :phone`,
       {
         replacements: {
-          email: email,
+          phone: phone,
         },
         type: QueryTypes.SELECT,
       }
@@ -163,6 +163,6 @@ module.exports = {
   findById,
   deleteById,
   getApiChatsByUserId,
-  checkEmail,
+  checkPhone,
   getFriendsByIdAndName,
 };

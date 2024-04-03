@@ -18,7 +18,7 @@ module.exports = {
       dob: {
         type: Sequelize.DATE
       },
-      email: {
+      phone: {
         type: Sequelize.STRING,
         unique : true,
       },

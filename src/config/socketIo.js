@@ -29,7 +29,6 @@ let SocketIo = (httpServer) => {
     });
 
     socket.on(`Client-Chat-Room-File`, async(data) => {
-      console.log(data);
       let fileUrl = await uploadFile(data.file)
         let dt = {
           url : fileUrl,

@@ -5,7 +5,8 @@ let {
     findById,
     deleteById,
     login,
-    checkPhone
+    checkPhone,
+    findByUserId
 } = require('../repositories/accountRepository')
 
 let createMethod = async(req, res) => {
@@ -43,6 +44,11 @@ let checkPhoneMethod = async(req, res) => {
     return res.status(200).json(data)
 }
 
+let findByUserIdMethod = async(req, res) => {
+    let data = await findByUserId(req.params.id)
+    return res.status(200).json(data)
+}
+
 
 module.exports = {
     createMethod,
@@ -51,5 +57,6 @@ module.exports = {
     findByIdMethod,
     deleteByIdMethod,
     loginMethod,
-    checkPhoneMethod
+    checkPhoneMethod,
+    findByUserIdMethod
 }
