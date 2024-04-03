@@ -50,6 +50,46 @@ let update = async (data) => {
   }
 };
 
+let updateImageAvatar = async (data) => {
+  try {
+    await sequelize.query(
+      `UPDATE Users
+        SET image = :image
+        WHERE id = :id`,
+      {
+        replacements: {
+          id: data.id,
+          image: data.image,
+        },
+        type: QueryTypes.UPDATE,
+      }
+    );
+    return await findById(data.id);
+  } catch (error) {
+    return null;
+  }
+};
+
+let updateImageBackground = async (data) => {
+  try {
+    await sequelize.query(
+      `UPDATE Users
+        SET background = :background
+        WHERE id = :id`,
+      {
+        replacements: {
+          id: data.id,
+          background: data.background,
+        },
+        type: QueryTypes.UPDATE,
+      }
+    );
+    return await findById(data.id);
+  } catch (error) {
+    return null;
+  }
+};
+
 let findAll = async () => {
   try {
     let datas = await sequelize.query("SELECT * FROM Users", {type : QueryTypes.SELECT})
@@ -165,4 +205,6 @@ module.exports = {
   getApiChatsByUserId,
   checkPhone,
   getFriendsByIdAndName,
+  updateImageAvatar,
+  updateImageBackground,
 };

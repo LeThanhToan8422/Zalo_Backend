@@ -8,7 +8,9 @@ let {
     deleteByIdMethod,
     getApiChatsByUserIdMethod,
     checkPhoneMethod,
-    getFriendsByIdAndNameMethod
+    getFriendsByIdAndNameMethod,
+    updateImageAvatarMethod,
+    updateImageBackgroundMethod
 } = require('../controllers/userController')
 
 router.get('/users', findAllMethod)
@@ -20,5 +22,7 @@ router.get('/users/get-chats-by-id/:id', getApiChatsByUserIdMethod)
 router.get('/users/phone/:phone', checkPhoneMethod)
 router.get('/users/friends/:id/:name', getFriendsByIdAndNameMethod)
 router.get('/users/friends/:id/', getApiChatsByUserIdMethod)
+router.put('/users/avatar', upload, updateImageAvatarMethod)
+router.put('/users/background', upload, updateImageBackgroundMethod)
 
 module.exports = router
