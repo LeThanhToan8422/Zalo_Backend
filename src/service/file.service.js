@@ -14,6 +14,7 @@ const FILE_TYPE_MATCH = [
   "image/gif",
   "video/mp3",
   "video/mp4",
+  "video/x-matroska",
   "application/pdf",
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -27,6 +28,7 @@ const FILE_TYPE_MATCH = [
   "application/x-zip-compressed",
 ];
 const uploadFile = async (file) => {
+  console.log(file);
   const filePath = `${randomString(4)}-${new Date().getTime()}--${
     file?.originalname
   }`;
