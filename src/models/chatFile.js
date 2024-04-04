@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       ChatFile.belongsTo(models.User, {foreignKey : 'sender'})
       ChatFile.belongsTo(models.User, {foreignKey : 'receiver'})
       ChatFile.belongsTo(models.GroupChat, {foreignKey : 'groupChat'})
+      ChatFile.hasMany(models.StatusChatFile, {foreignKey : 'chat_file'})
     }
   }
   ChatFile.init({

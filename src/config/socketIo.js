@@ -2,6 +2,7 @@ const { Server } = require("socket.io");
 const chatRepository = require('../repositories/chatRepository')
 const chatFileRepository = require('../repositories/chatFileRepository');
 const { uploadFile } = require("../service/file.service");
+const { updateImageAvatar, updateImageBackground } = require("../repositories/userRepository");
 
 let SocketIo = (httpServer) => {
   const io = new Server(httpServer, { 
@@ -37,6 +38,26 @@ let SocketIo = (httpServer) => {
         }
         await chatFileRepository.create(dt)
         io.emit(`Server-Chat-Room-${data.chatRoom}`, { data: dt }); 
+    });
+
+    socket.on(`Client-update-avatar`, async(data) => {
+      let fileUrl = await uploadFile(data.file)
+        let dt = {
+          image : fileUrl,
+          id : data.id,
+        }
+        let user = await updateImageAvatar(dt)
+        io.emit(`Server-update-avatar-${data.id}`, { data: user }); 
+    });
+
+    socket.on(`Client-update-background`, async(data) => {
+      let fileUrl = await uploadFile(data.file)
+        let dt = {
+          background : fileUrl,
+          id : data.id,
+        }
+        let user = await updateImageBackground(dt)
+        io.emit(`Server-update-background-${data.id}`, { data: user }); 
     });
 
     socket.on("disconnect", () => {

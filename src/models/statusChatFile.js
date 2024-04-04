@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class StatusChat extends Model {
+  class StatusChatFile extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,15 +11,15 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      StatusChat.belongsTo(models.User, {foreignKey : 'implementer'})
-      StatusChat.belongsTo(models.Chat, {foreignKey : 'chat'})
+      StatusChatFile.belongsTo(models.User, {foreignKey : 'implementer'})
+      StatusChatFile.belongsTo(models.ChatFile, {foreignKey : 'chat_file'})
     }
   }
-  StatusChat.init({
+  StatusChatFile.init({
     status: DataTypes.ENUM('delete', 'recalls'),
   }, {
     sequelize,
-    modelName: 'StatusChat',
+    modelName: 'StatusChatFile',
   });
-  return StatusChat;
+  return StatusChatFile;
 };
