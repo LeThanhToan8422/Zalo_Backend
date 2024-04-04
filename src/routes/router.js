@@ -3,7 +3,7 @@ let Router = (app) => {
   app.use("/", require("./account"));
   app.use("/", require("./user"));
   app.use("/", require("./chat"));
-  app.use("/", require("./chatFile"));
+  app.use("/", require("./statusChat"));
 };
 
 module.exports = {

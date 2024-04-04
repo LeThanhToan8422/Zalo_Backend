@@ -72,16 +72,6 @@ let getApiChatBetweenUsers = (userId, idChat) => {
             WHERE (c.sender = :sender AND c.receiver = :receiver OR c.sender = :receiver AND c.receiver = :sender)
             AND if(stc.implementer = :id, 1, 0) OR stc.status = 'recalls'
         )
-        UNION ALL 
-        SELECT * FROM Chat_Files AS cf 
-        WHERE (cf.sender = :sender AND cf.receiver = :receiver OR cf.sender = :receiver AND cf.receiver = :sender)
-        AND cf.dateTimeSend NOT IN (
-            SELECT cf.dateTimeSend FROM Chat_Files AS cf 
-            INNER JOIN Status_Chat_File AS stcf ON cf.id = stcf.chat_file
-            WHERE (cf.sender = :sender AND cf.receiver = :receiver OR cf.sender = :receiver AND cf.receiver = :sender)
-            AND if(stcf.implementer = :id, 1, 0) OR stcf.status = 'recalls'
-            
-        )
         ORDER BY dateTimeSend ASC
         `,
       {

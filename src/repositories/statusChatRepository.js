@@ -4,10 +4,9 @@ let { sequelize, Op } = require('../models/index')
 
 let create = async(data) => {
     try {
-        await sequelize.query(`INSERT INTO Status_Chat (type, status, implementer, chat)
-        VALUES (:type, :status, :implementer, :chat)`, {
+        await sequelize.query(`INSERT INTO Status_Chat (status, implementer, chat)
+        VALUES (:status, :implementer, :chat)`, {
             replacements :{
-                type : data.type,
                 status : data.status,
                 implementer : data.implementer,
                 chat : data.chat
