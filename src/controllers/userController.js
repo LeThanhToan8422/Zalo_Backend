@@ -8,6 +8,7 @@ let {
     getApiChatsByUserId,
     checkPhone,
     getFriendsByIdAndName,
+    getFriendsById,
     updateImageAvatar,
     updateImageBackground,
 } = require('../repositories/userRepository')
@@ -53,22 +54,9 @@ let getFriendsByIdAndNameMethod = async(req, res) => {
     return res.status(200).json(datas)
 }
 
-let updateImageAvatarMethod = async(req, res) => {
-    let avatarUrl = await uploadFile(req.body.file)
-    let data = await updateImageAvatar({
-        id : req.body.id,
-        image : avatarUrl,
-    })
-    return res.status(200).json(data)
-}
-
-let updateImageBackgroundMethod = async(req, res) => {
-    let backgroundUrl = await uploadFile(req.body.file)
-    let data = await updateImageBackground({
-        id : req.body.id,
-        background : backgroundUrl,
-    })
-    return res.status(200).json(data)
+let getFriendsByIdMethod = async(req, res) => {
+    let datas = await getFriendsById(req.params.id)
+    return res.status(200).json(datas)
 }
 
 module.exports = {
@@ -80,6 +68,5 @@ module.exports = {
     getApiChatsByUserIdMethod,
     checkPhoneMethod,
     getFriendsByIdAndNameMethod,
-    updateImageAvatarMethod,
-    updateImageBackgroundMethod
+    getFriendsByIdMethod,
 }

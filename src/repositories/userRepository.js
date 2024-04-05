@@ -196,6 +196,35 @@ let getFriendsByIdAndName = async (id, name) => {
   }
 };
 
+let getFriendsById = async (id) => {
+  try {
+    let datas = await sequelize.query(
+      `SELECT u.*
+      FROM Users u
+      JOIN (
+        SELECT JSON_UNQUOTE(friend_id) AS friend_id
+        FROM Users
+        CROSS JOIN JSON_TABLE(
+          relationships,
+          '$.friends[*]' COLUMNS (
+            friend_id VARCHAR(255) PATH '$'
+          )
+        ) AS friends
+        WHERE id = :id
+      ) f ON u.id = CAST(f.friend_id AS INT)`,
+      {
+        replacements: {
+          id : Number(id),
+        },
+        type: QueryTypes.SELECT,
+      }
+    );
+    return datas;
+  } catch (error) {
+    return null;
+  }
+};
+
 module.exports = {
   create,
   update,
@@ -207,4 +236,5 @@ module.exports = {
   getFriendsByIdAndName,
   updateImageAvatar,
   updateImageBackground,
+  getFriendsById
 };
