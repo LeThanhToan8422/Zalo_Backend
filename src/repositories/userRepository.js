@@ -136,10 +136,11 @@ let getApiChatsByUserId = async (id) => {
       FROM Users AS u INNER JOIN Chats as c ON (c.sender = u.id AND c.receiver = :id) OR (c.sender = :id AND c.receiver = u.id)
       WHERE c.id = ( 
         SELECT id FROM Chats AS c 
-        WHERE (sender = u.id AND receiver = :id) OR (sender = :id AND receiver = u.id) AND c.id NOT IN (
+        WHERE ((sender = u.id AND receiver = :id) OR (sender = :id AND receiver = u.id)) AND c.id NOT IN (
           SELECT c.id FROM Chats AS c 
           INNER JOIN Status_Chat AS st ON c.id = st.chat
-          WHERE (sender = u.id AND receiver = :id) OR (sender = :id AND receiver = u.id)
+          WHERE ((sender = u.id AND receiver = :id) OR (sender = :id AND receiver = u.id))
+          AND if(st.implementer = :id, 1, 0) OR st.status = 'recalls'
         )
         ORDER BY c.dateTimeSend DESC
         LIMIT 1
