@@ -10,11 +10,13 @@ let {
     checkPhoneMethod,
     getFriendsByIdAndNameMethod,
     getFriendsByIdMethod,
+    updateRelationshipsMethod
 } = require('../controllers/userController')
 
 router.get('/users', findAllMethod)
 router.get('/users/:id', findByIdMethod)
 router.post('/users', upload, createMethod)
+router.post('/users/relationships', upload, updateRelationshipsMethod)
 router.put('/users', upload, updateMethod)
 router.delete('/users/:id', deleteByIdMethod)
 router.get('/users/get-chats-by-id/:id', getApiChatsByUserIdMethod)

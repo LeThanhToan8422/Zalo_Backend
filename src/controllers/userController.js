@@ -9,8 +9,8 @@ let {
     checkPhone,
     getFriendsByIdAndName,
     getFriendsById,
-    updateImageAvatar,
-    updateImageBackground,
+    updateFriendsRelationships,
+    updateBlockRelationships,
 } = require('../repositories/userRepository')
 const { uploadFile } = require('../service/file.service')
 
@@ -22,6 +22,17 @@ let createMethod = async(req, res) => {
 let updateMethod = async(req, res) => {
     let data = await update(req.body)
     return res.status(200).json(data)
+}
+
+let updateRelationshipsMethod = async(req, res) => {
+    let result = false
+    if(req.body.relationship === "friends"){
+        result = await updateFriendsRelationships(req.body)
+    }
+    else{
+        result = await updateBlockRelationships(req.body)
+    }
+    return res.status(200).json(result)
 }
 
 let findAllMethod = async(req, res) => {
@@ -69,4 +80,5 @@ module.exports = {
     checkPhoneMethod,
     getFriendsByIdAndNameMethod,
     getFriendsByIdMethod,
+    updateRelationshipsMethod
 }

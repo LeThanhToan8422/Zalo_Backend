@@ -50,6 +50,149 @@ let update = async (data) => {
   }
 };
 
+let updateFriendsRelationships = async (data) => {
+  try {
+    await sequelize.query(
+      `UPDATE Users
+      SET relationships = 
+          CASE 
+              WHEN JSON_CONTAINS(relationships, '{"block": [:objectId]}') THEN 
+                  JSON_SET(
+                      JSON_REMOVE(
+                          relationships, 
+                          JSON_UNQUOTE(
+                              JSON_SEARCH(relationships, 'one', ':objectId', NULL, '$.block')
+                          )
+                      ), 
+                      '$.friends', 
+                      JSON_ARRAY_APPEND(
+                          JSON_EXTRACT(relationships, '$.friends'),
+                          '$',
+                          CAST(':objectId' AS UNSIGNED)
+                      )
+                  )
+              ELSE
+                  CASE 
+                      WHEN JSON_CONTAINS(relationships, '{"friends": [:objectId]}') THEN 
+                          relationships
+                      ELSE 
+                          CASE 
+                              WHEN JSON_SEARCH(relationships, 'one', ':objectId', NULL, '$.friends') IS NULL 
+                                   AND JSON_SEARCH(relationships, 'one', ':objectId', NULL, '$.block') IS NULL THEN 
+                                  JSON_SET(
+                                      relationships,
+                                      '$.friends', 
+                                      JSON_ARRAY_APPEND(
+                                          JSON_EXTRACT(relationships, '$.friends'),
+                                          '$',
+                                          CAST(':objectId' AS UNSIGNED)
+                                      )
+                                  )
+                              ELSE 
+                                  JSON_SET(
+                                      JSON_REMOVE(
+                                          JSON_REMOVE(relationships, '$.block'),
+                                          '$.friends'
+                                      ), 
+                                      '$.friends', 
+                                      JSON_ARRAY_APPEND(
+                                          JSON_EXTRACT(relationships, '$.friends'),
+                                          '$',
+                                          CAST(':objectId' AS UNSIGNED)
+                                      )
+                                  )
+                          END
+                  END
+          END
+      WHERE id = :id;
+      `,
+      {
+        replacements: {
+          id: data.id,
+          objectId: data.objectId,
+        },
+        type: QueryTypes.UPDATE,
+      }
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+let updateBlockRelationships = async (data) => {
+  try {
+    await sequelize.query(
+      `UPDATE Users
+      SET relationships = 
+          CASE 
+              WHEN JSON_CONTAINS(relationships, '{"friends": [:objectId]}') THEN 
+                  JSON_SET(
+                      JSON_REMOVE(
+                          relationships, 
+                          JSON_UNQUOTE(
+                              JSON_SEARCH(relationships, 'one', ':objectId', NULL, '$.friends')
+                          )
+                      ), 
+                      '$.block', 
+                      COALESCE(
+                          JSON_ARRAY_APPEND(
+                              JSON_EXTRACT(relationships, '$.block'),
+                              '$',
+                              CAST(':objectId' AS UNSIGNED)
+                          ),
+                          JSON_ARRAY(CAST(':objectId' AS UNSIGNED))
+                      )
+                  )
+              ELSE
+                  CASE 
+                      WHEN JSON_CONTAINS(relationships, '{"block": [:objectId]}') THEN 
+                          relationships
+                      ELSE 
+                          CASE 
+                              WHEN JSON_SEARCH(relationships, 'one', ':objectId', NULL, '$.friends') IS NULL 
+                                   AND JSON_SEARCH(relationships, 'one', ':objectId', NULL, '$.block') IS NULL THEN 
+                                  JSON_SET(
+                                      relationships,
+                                      '$.block', 
+                                      JSON_ARRAY_APPEND(
+                                          JSON_EXTRACT(relationships, '$.block'),
+                                          '$',
+                                          CAST(':objectId' AS UNSIGNED)
+                                      )
+                                  )
+                              ELSE 
+                                  JSON_SET(
+                                      JSON_REMOVE(
+                                          JSON_REMOVE(relationships, '$.block'),
+                                          '$.friends'
+                                      ), 
+                                      '$.block', 
+                                      JSON_ARRAY_APPEND(
+                                          JSON_EXTRACT(relationships, '$.block'),
+                                          '$',
+                                          CAST(':objectId' AS UNSIGNED)
+                                      )
+                                  )
+                          END
+                  END
+          END
+      WHERE id = :id;
+      `,
+      {
+        replacements: {
+          id: data.id,
+          objectId: data.objectId,
+        },
+        type: QueryTypes.UPDATE,
+      }
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
 let updateImageAvatar = async (data) => {
   try {
     await sequelize.query(
@@ -92,7 +235,9 @@ let updateImageBackground = async (data) => {
 
 let findAll = async () => {
   try {
-    let datas = await sequelize.query("SELECT * FROM Users", {type : QueryTypes.SELECT})
+    let datas = await sequelize.query("SELECT * FROM Users", {
+      type: QueryTypes.SELECT,
+    });
     return datas;
   } catch (error) {
     return null;
@@ -194,7 +339,7 @@ let getFriendsByIdAndName = async (id, name) => {
       WHERE u.name LIKE :name`,
       {
         replacements: {
-          id : Number(id),
+          id: Number(id),
           name: `%${name}%`,
         },
         type: QueryTypes.SELECT,
@@ -224,7 +369,7 @@ let getFriendsById = async (id) => {
       ) f ON u.id = CAST(f.friend_id AS INT)`,
       {
         replacements: {
-          id : Number(id),
+          id: Number(id),
         },
         type: QueryTypes.SELECT,
       }
@@ -235,7 +380,7 @@ let getFriendsById = async (id) => {
   }
 };
 
-let getApiChatsFinalByUserIdAndChatId = async(id, chatId) => {
+let getApiChatsFinalByUserIdAndChatId = async (id, chatId) => {
   try {
     let datas = await sequelize.query(
       `SELECT u.id, u.name, u.gender, u.dob, u.phone, u.image, u.background, c.message, c.dateTimeSend, c.receiver, c.sender
@@ -254,7 +399,7 @@ let getApiChatsFinalByUserIdAndChatId = async(id, chatId) => {
       {
         replacements: {
           sender: id,
-          receiver: chatId
+          receiver: chatId,
         },
         type: QueryTypes.SELECT,
       }
@@ -277,5 +422,7 @@ module.exports = {
   updateImageAvatar,
   updateImageBackground,
   getFriendsById,
-  getApiChatsFinalByUserIdAndChatId
+  getApiChatsFinalByUserIdAndChatId,
+  updateFriendsRelationships,
+  updateBlockRelationships,
 };
