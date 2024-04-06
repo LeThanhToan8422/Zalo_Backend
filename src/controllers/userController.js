@@ -27,10 +27,11 @@ let updateMethod = async(req, res) => {
 let updateRelationshipsMethod = async(req, res) => {
     let result = false
     if(req.body.relationship === "friends"){
-        result = await updateFriendsRelationships(req.body)
+        if(await updateFriendsRelationships(req.body.id, req.body.objectId))
+            result = await updateFriendsRelationships(req.body.objectId, req.body.id)
     }
     else{
-        result = await updateBlockRelationships(req.body)
+        result = await updateBlockRelationships(req.body.id, req.body.objectId)
     }
     return res.status(200).json(result)
 }

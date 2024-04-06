@@ -50,42 +50,42 @@ let update = async (data) => {
   }
 };
 
-let updateFriendsRelationships = async (data) => {
+let updateFriendsRelationships = async (id, objectId) => {
   try {
     await sequelize.query(
       `UPDATE Users
       SET relationships = 
           CASE 
-              WHEN JSON_CONTAINS(relationships, '{"block": [:objectId]}') THEN 
+              WHEN JSON_CONTAINS(relationships, '{"block": [${objectId}]}') THEN 
                   JSON_SET(
                       JSON_REMOVE(
                           relationships, 
                           JSON_UNQUOTE(
-                              JSON_SEARCH(relationships, 'one', ':objectId', NULL, '$.block')
+                              JSON_SEARCH(relationships, 'one', '${objectId}', NULL, '$.block')
                           )
                       ), 
                       '$.friends', 
                       JSON_ARRAY_APPEND(
                           JSON_EXTRACT(relationships, '$.friends'),
                           '$',
-                          CAST(':objectId' AS UNSIGNED)
+                          CAST('${objectId}' AS UNSIGNED)
                       )
                   )
               ELSE
                   CASE 
-                      WHEN JSON_CONTAINS(relationships, '{"friends": [:objectId]}') THEN 
+                      WHEN JSON_CONTAINS(relationships, '{"friends": [${objectId}]}') THEN 
                           relationships
                       ELSE 
                           CASE 
-                              WHEN JSON_SEARCH(relationships, 'one', ':objectId', NULL, '$.friends') IS NULL 
-                                   AND JSON_SEARCH(relationships, 'one', ':objectId', NULL, '$.block') IS NULL THEN 
+                              WHEN JSON_SEARCH(relationships, 'one', '${objectId}', NULL, '$.friends') IS NULL 
+                                   AND JSON_SEARCH(relationships, 'one', '${objectId}', NULL, '$.block') IS NULL THEN 
                                   JSON_SET(
                                       relationships,
                                       '$.friends', 
                                       JSON_ARRAY_APPEND(
                                           JSON_EXTRACT(relationships, '$.friends'),
                                           '$',
-                                          CAST(':objectId' AS UNSIGNED)
+                                          CAST('${objectId}' AS UNSIGNED)
                                       )
                                   )
                               ELSE 
@@ -98,19 +98,15 @@ let updateFriendsRelationships = async (data) => {
                                       JSON_ARRAY_APPEND(
                                           JSON_EXTRACT(relationships, '$.friends'),
                                           '$',
-                                          CAST(':objectId' AS UNSIGNED)
+                                          CAST('${objectId}' AS UNSIGNED)
                                       )
                                   )
                           END
                   END
           END
-      WHERE id = :id;
+      WHERE id = ${id};
       `,
       {
-        replacements: {
-          id: data.id,
-          objectId: data.objectId,
-        },
         type: QueryTypes.UPDATE,
       }
     );
@@ -120,18 +116,18 @@ let updateFriendsRelationships = async (data) => {
   }
 };
 
-let updateBlockRelationships = async (data) => {
+let updateBlockRelationships = async (id, objectId) => {
   try {
     await sequelize.query(
       `UPDATE Users
       SET relationships = 
           CASE 
-              WHEN JSON_CONTAINS(relationships, '{"friends": [:objectId]}') THEN 
+              WHEN JSON_CONTAINS(relationships, '{"friends": [${objectId}]}') THEN 
                   JSON_SET(
                       JSON_REMOVE(
                           relationships, 
                           JSON_UNQUOTE(
-                              JSON_SEARCH(relationships, 'one', ':objectId', NULL, '$.friends')
+                              JSON_SEARCH(relationships, 'one', '${objectId}', NULL, '$.friends')
                           )
                       ), 
                       '$.block', 
@@ -139,26 +135,26 @@ let updateBlockRelationships = async (data) => {
                           JSON_ARRAY_APPEND(
                               JSON_EXTRACT(relationships, '$.block'),
                               '$',
-                              CAST(':objectId' AS UNSIGNED)
+                              CAST('${objectId}' AS UNSIGNED)
                           ),
-                          JSON_ARRAY(CAST(':objectId' AS UNSIGNED))
+                          JSON_ARRAY(CAST('${objectId}' AS UNSIGNED))
                       )
                   )
               ELSE
                   CASE 
-                      WHEN JSON_CONTAINS(relationships, '{"block": [:objectId]}') THEN 
+                      WHEN JSON_CONTAINS(relationships, '{"block": [${objectId}]}') THEN 
                           relationships
                       ELSE 
                           CASE 
-                              WHEN JSON_SEARCH(relationships, 'one', ':objectId', NULL, '$.friends') IS NULL 
-                                   AND JSON_SEARCH(relationships, 'one', ':objectId', NULL, '$.block') IS NULL THEN 
+                              WHEN JSON_SEARCH(relationships, 'one', '${objectId}', NULL, '$.friends') IS NULL 
+                                   AND JSON_SEARCH(relationships, 'one', '${objectId}', NULL, '$.block') IS NULL THEN 
                                   JSON_SET(
                                       relationships,
                                       '$.block', 
                                       JSON_ARRAY_APPEND(
                                           JSON_EXTRACT(relationships, '$.block'),
                                           '$',
-                                          CAST(':objectId' AS UNSIGNED)
+                                          CAST('${objectId}' AS UNSIGNED)
                                       )
                                   )
                               ELSE 
@@ -171,19 +167,15 @@ let updateBlockRelationships = async (data) => {
                                       JSON_ARRAY_APPEND(
                                           JSON_EXTRACT(relationships, '$.block'),
                                           '$',
-                                          CAST(':objectId' AS UNSIGNED)
+                                          CAST('${objectId}' AS UNSIGNED)
                                       )
                                   )
                           END
                   END
           END
-      WHERE id = :id;
+      WHERE id = ${id};
       `,
       {
-        replacements: {
-          id: data.id,
-          objectId: data.objectId,
-        },
         type: QueryTypes.UPDATE,
       }
     );
