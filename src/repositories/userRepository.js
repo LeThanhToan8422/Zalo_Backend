@@ -129,12 +129,21 @@ let deleteById = async (id) => {
   }
 };
 
-let getApiChatsByUserId = (id) => {
+let getApiChatsByUserId = async (id) => {
   try {
-    let datas = sequelize.query(
+    let datas = await sequelize.query(
       `SELECT u.id, u.name, u.gender, u.dob, u.phone, u.image, u.background, c.message, c.dateTimeSend, c.receiver, c.sender
-        FROM Users AS u INNER JOIN Chats as c ON (c.sender = u.id AND c.receiver = :id) OR (c.sender = :id AND c.receiver = u.id)
-        WHERE u.id <> :id AND c.id = ( SELECT MAX(id) FROM Chats WHERE (sender = u.id AND receiver = :id) OR (sender = :id AND receiver = u.id))`,
+      FROM Users AS u INNER JOIN Chats as c ON (c.sender = u.id AND c.receiver = :id) OR (c.sender = :id AND c.receiver = u.id)
+      WHERE c.id = ( 
+        SELECT id FROM Chats AS c 
+        WHERE (sender = u.id AND receiver = :id) OR (sender = :id AND receiver = u.id) AND c.id NOT IN (
+          SELECT c.id FROM Chats AS c 
+          INNER JOIN Status_Chat AS st ON c.id = st.chat
+          WHERE (sender = u.id AND receiver = :id) OR (sender = :id AND receiver = u.id)
+        )
+        ORDER BY c.dateTimeSend DESC
+        LIMIT 1
+      )`,
       {
         replacements: {
           id: id,
@@ -225,6 +234,36 @@ let getFriendsById = async (id) => {
   }
 };
 
+let getApiChatsFinalByUserIdAndChatId = async(id, chatId) => {
+  try {
+    let datas = await sequelize.query(
+      `SELECT u.id, u.name, u.gender, u.dob, u.phone, u.image, u.background, c.message, c.dateTimeSend, c.receiver, c.sender
+      FROM Users AS u 
+      INNER JOIN Chats as c ON (c.sender = u.id AND c.receiver = :sender) OR (c.sender = :sender AND c.receiver = u.id)
+      WHERE c.id = ( 
+        SELECT id FROM Chats AS c 
+        WHERE (c.sender = :receiver AND c.receiver = :sender) OR (c.sender = :sender AND c.receiver = :receiver) AND c.id NOT IN (
+          SELECT c.id FROM Chats AS c 
+          INNER JOIN Status_Chat AS st ON c.id = st.chat
+          WHERE (c.sender = :receiver AND c.receiver = :sender) OR (c.sender = :sender AND c.receiver = :receiver)
+        )
+        ORDER BY c.dateTimeSend DESC
+        LIMIT 1
+      )`,
+      {
+        replacements: {
+          sender: id,
+          receiver: chatId
+        },
+        type: QueryTypes.SELECT,
+      }
+    );
+    return datas[0];
+  } catch (error) {
+    return null;
+  }
+};
+
 module.exports = {
   create,
   update,
@@ -236,5 +275,6 @@ module.exports = {
   getFriendsByIdAndName,
   updateImageAvatar,
   updateImageBackground,
-  getFriendsById
+  getFriendsById,
+  getApiChatsFinalByUserIdAndChatId
 };

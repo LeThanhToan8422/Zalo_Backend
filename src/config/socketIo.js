@@ -5,6 +5,7 @@ const { uploadFile } = require("../service/file.service");
 const {
   updateImageAvatar,
   updateImageBackground,
+  getApiChatsFinalByUserIdAndChatId
 } = require("../repositories/userRepository");
 
 let SocketIo = (httpServer) => {
@@ -25,6 +26,7 @@ let SocketIo = (httpServer) => {
     });
 
     socket.on(`Client-Chat-Room`, async (data) => {
+      console.log("DATA : ", data);
       if (data.message) {
         await chatRepository.create(data);
         io.emit(`Server-Chat-Room-${data.chatRoom}`, { data: data });
@@ -36,9 +38,13 @@ let SocketIo = (httpServer) => {
       }
     });
 
-    socket.on(`Client-Recalls-Chat`, async (data) => {
-      await statusChatRepository.create(data);
-      io.emit(`Server-Recalls-Chat-${data.chatRoom}`, { data: data });
+    socket.on(`Client-Status-Chat`, async (data) => {
+      console.log(data);
+      let result = await statusChatRepository.create(data);
+      if(result){
+        let chatFinal = await getApiChatsFinalByUserIdAndChatId(data.implementer, data.objectId)
+        io.emit(`Server-Status-Chat-${data.chatRoom}`, { data: chatFinal });
+      }
     });
 
     socket.on(`Client-update-avatar`, async (data) => {
