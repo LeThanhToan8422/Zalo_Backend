@@ -33,7 +33,7 @@ let SocketIo = (httpServer) => {
       } else if (data.file) {
         let fileUrl = await uploadFile(data.file);
         data.message = fileUrl;
-        await chatRepository.create(data);
+        let result = await chatRepository.create(data);
         io.emit(`Server-Chat-Room-${data.chatRoom}`, { data: data });
       }
     });

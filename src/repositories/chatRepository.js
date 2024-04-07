@@ -3,7 +3,6 @@ let db = require("../models/index");
 let { sequelize, Op } = require("../models/index");
 
 let create = async (data) => {
-  console.log(data.dateTimeSend);
   try {
     await sequelize.query(
       `INSERT INTO Chats (message, dateTimeSend, sender, receiver)
@@ -20,6 +19,7 @@ let create = async (data) => {
     );
     return true;
   } catch (error) {
+    console.log(error);
     return false;
   }
 };
