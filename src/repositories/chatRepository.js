@@ -3,6 +3,7 @@ let db = require("../models/index");
 let { sequelize, Op } = require("../models/index");
 
 let create = async (data) => {
+  let dateTimeSend = new Date()
   try {
     await sequelize.query(
       `INSERT INTO Chats (message, dateTimeSend, sender, receiver)
@@ -10,14 +11,14 @@ let create = async (data) => {
       {
         replacements: {
           message: data.message,
-          dateTimeSend: new Date(),
+          dateTimeSend: dateTimeSend,
           sender: data.sender,
           receiver: data.receiver,
         },
         type: QueryTypes.INSERT,
       }
     );
-    return true;
+    return dateTimeSend;
   } catch (error) {
     return false;
   }
