@@ -26,8 +26,8 @@ let SocketIo = (httpServer) => {
     });
 
     socket.on(`Client-Chat-Room`, async (data) => {
-      let dateTimeSend = new Date()
-      dateTimeSend.setUTCHours(currentDate.getUTCHours() + 7)
+      let dateTimeSend = new Date().toLocaleString('en-US', {timeZone: 'Asia/Ho_Chi_Minh'})
+      // dateTimeSend.setUTCHours(currentDate.getUTCHours() + 7)
       data.dateTimeSend = dateTimeSend
       if (data.message) {
         await chatRepository.create(data);

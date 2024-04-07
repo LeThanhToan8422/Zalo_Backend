@@ -10,7 +10,7 @@ let create = async (data) => {
       {
         replacements: {
           message: data.message,
-          dateTimeSend: data.dateTimeSend,
+          dateTimeSend: new Date(),
           sender: data.sender,
           receiver: data.receiver,
         },
