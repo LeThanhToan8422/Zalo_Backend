@@ -26,6 +26,8 @@ let SocketIo = (httpServer) => {
     });
 
     socket.on(`Client-Chat-Room`, async (data) => {
+      let dateTimeSend = new Date()
+      data.dateTimeSend = dateTimeSend
       if (data.message) {
         await chatRepository.create(data);
         io.emit(`Server-Chat-Room-${data.chatRoom}`, { data: data });
