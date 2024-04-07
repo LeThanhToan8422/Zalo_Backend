@@ -7,6 +7,7 @@ const {
   updateImageBackground,
   getApiChatsFinalByUserIdAndChatId
 } = require("../repositories/userRepository");
+const moment = require("moment");
 
 let SocketIo = (httpServer) => {
   const io = new Server(httpServer, {
@@ -26,8 +27,7 @@ let SocketIo = (httpServer) => {
     });
 
     socket.on(`Client-Chat-Room`, async (data) => {
-      let dateTimeSend = new Date().toLocaleString('en-US', {timeZone: 'Asia/Ho_Chi_Minh'})
-      // dateTimeSend.setUTCHours(currentDate.getUTCHours() + 7)
+      let dateTimeSend = moment().format('YYYY-MM-DD HH:mm:ss')
       data.dateTimeSend = dateTimeSend
       if (data.message) {
         await chatRepository.create(data);
