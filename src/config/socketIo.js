@@ -38,11 +38,13 @@ let SocketIo = (httpServer) => {
     });
 
     socket.on(`Client-Status-Chat`, async (data) => {
-      console.log(data);
       let result = await statusChatRepository.create(data);
       if(result){
         let chatFinal = await getApiChatsFinalByUserIdAndChatId(data.implementer, data.objectId)
-        io.emit(`Server-Status-Chat-${data.chatRoom}`, { data: chatFinal });
+        io.emit(`Server-Status-Chat-${data.chatRoom}`, { data: {
+          id : data.chat,
+          chatFinal : chatFinal
+        } });
       }
     });
 

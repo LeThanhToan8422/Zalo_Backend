@@ -13,7 +13,7 @@ let create = async(data) => {
             },
             type : QueryTypes.INSERT
         })
-        return true
+        return data.chat
     } catch (error) {
         return false
     }
