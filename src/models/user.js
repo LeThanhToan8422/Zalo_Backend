@@ -17,6 +17,8 @@ module.exports = (sequelize, DataTypes) => {
       User.hasOne(models.GroupChat, {foreignKey : 'leader'})
       User.hasMany(models.NickName, {foreignKey : 'user'})
       User.hasOne(models.StatusChat, {foreignKey : 'implementer'})
+      User.hasMany(models.MakeFriends, {foreignKey : 'giver'})
+      User.hasMany(models.MakeFriends, {foreignKey : 'recipient'})
     }
   }
   User.init({

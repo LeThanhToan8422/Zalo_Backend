@@ -402,6 +402,20 @@ let getApiChatsFinalByUserIdAndChatId = async (id, chatId) => {
   }
 };
 
+let checkIsFriendByUserId = async (userId, friendId) => {
+  try {
+    let data = await sequelize.query(
+      `SELECT JSON_CONTAINS(relationships, '{"friends": [${friendId}]}') AS isFriends FROM Users WHERE id = ${userId}`,
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+    return data[0];
+  } catch (error) {
+    return null;
+  }
+};
+
 module.exports = {
   create,
   update,
@@ -417,4 +431,5 @@ module.exports = {
   getApiChatsFinalByUserIdAndChatId,
   updateFriendsRelationships,
   updateBlockRelationships,
+  checkIsFriendByUserId
 };

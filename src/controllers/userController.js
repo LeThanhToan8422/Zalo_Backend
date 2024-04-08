@@ -11,6 +11,7 @@ let {
     getFriendsById,
     updateFriendsRelationships,
     updateBlockRelationships,
+    checkIsFriendByUserId
 } = require('../repositories/userRepository')
 const { uploadFile } = require('../service/file.service')
 
@@ -71,6 +72,11 @@ let getFriendsByIdMethod = async(req, res) => {
     return res.status(200).json(datas)
 }
 
+let checkIsFriendMethod = async(req, res) => {
+    let data = await checkIsFriendByUserId(req.params.userId, req.params.friendId)
+    return res.status(200).json(data)
+}
+
 module.exports = {
     createMethod,
     updateMethod,
@@ -81,5 +87,6 @@ module.exports = {
     checkPhoneMethod,
     getFriendsByIdAndNameMethod,
     getFriendsByIdMethod,
-    updateRelationshipsMethod
+    updateRelationshipsMethod,
+    checkIsFriendMethod
 }
