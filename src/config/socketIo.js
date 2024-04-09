@@ -5,7 +5,7 @@ const { uploadFile } = require("../service/file.service");
 const {
   updateImageAvatar,
   updateImageBackground,
-  getApiChatsFinalByUserIdAndChatId
+  getApiChatsFinalByUserIdAndChatId,
 } = require("../repositories/userRepository");
 const moment = require("moment");
 
@@ -33,20 +33,40 @@ let SocketIo = (httpServer) => {
       } else if (data.file) {
         let fileUrl = await uploadFile(data.file);
         data.message = fileUrl;
-        let result = await chatRepository.create(data);
+        await chatRepository.create(data);
         io.emit(`Server-Chat-Room-${data.chatRoom}`, { data: data });
       }
     });
 
     socket.on(`Client-Status-Chat`, async (data) => {
       let result = await statusChatRepository.create(data);
-      if(result){
-        let chatFinal = await getApiChatsFinalByUserIdAndChatId(data.implementer, data.objectId)
-        io.emit(`Server-Status-Chat-${data.chatRoom}`, { data: {
-          id : data.chat,
-          chatFinal : chatFinal
-        } });
+      if (result) {
+        let chatFinal = await getApiChatsFinalByUserIdAndChatId(
+          data.implementer,
+          data.objectId
+        );
+        io.emit(`Server-Status-Chat-${data.chatRoom}`, {
+          data: {
+            id: data.chat,
+            chatFinal: chatFinal,
+          },
+        });
       }
+    });
+
+    socket.on(`Client-Delete-Chat`, async (data) => {
+      let idChats = await chatRepository.getApiChatBetweenUsersForDelete(
+        data.implementer,
+        data.objectId
+      );
+      for (let i = 0; i < idChats.length; i++) {
+        let rss = await statusChatRepository.create({
+          status: "delete",
+          implementer: data.implementer,
+          chat: idChats[i].id,
+        });
+      }
+      io.emit(`Server-Delete-Chat-${data.implementer}`, {data : true});
     });
 
     socket.on(`Client-update-avatar`, async (data) => {

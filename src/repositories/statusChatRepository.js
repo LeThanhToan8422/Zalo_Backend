@@ -3,6 +3,7 @@ let db = require('../models/index')
 let { sequelize, Op } = require('../models/index')
 
 let create = async(data) => {
+    console.log(data);
     try {
         await sequelize.query(`INSERT INTO Status_Chat (status, implementer, chat)
         VALUES (:status, :implementer, :chat)`, {
@@ -15,6 +16,7 @@ let create = async(data) => {
         })
         return data.chat
     } catch (error) {
+        console.log(error);
         return false
     }
 }

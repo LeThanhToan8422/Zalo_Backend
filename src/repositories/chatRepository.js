@@ -19,7 +19,6 @@ let create = async (data) => {
     );
     return true;
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
@@ -62,24 +61,50 @@ let deleteById = async (id) => {
   }
 };
 
-let getApiChatBetweenUsers = (userId, idChat) => {
+let getApiChatBetweenUsers = (userId, idChat, page) => {
   try {
     let datas = sequelize.query(
-      `SELECT * FROM Chats AS c
+      `SELECT *, IF(FIND_IN_SET(c.id, (SELECT GROUP_CONCAT(st.chat SEPARATOR ',') FROM Status_Chat AS st WHERE st.status = 'recalls')) > 0, TRUE, FALSE) AS isRecalls FROM Chats AS c
         WHERE (c.sender = :sender AND c.receiver = :receiver OR c.sender = :receiver AND c.receiver = :sender)
         AND c.dateTimeSend NOT IN (
             SELECT c.dateTimeSend FROM Chats AS c 
             INNER JOIN Status_Chat AS stc ON c.id = stc.chat
             WHERE (c.sender = :sender AND c.receiver = :receiver OR c.sender = :receiver AND c.receiver = :sender)
-            AND if(stc.implementer = :id, 1, 0) OR stc.status = 'recalls'
-        )
+            AND if(stc.implementer = :sender, 1, 0) AND stc.status = 'delete'
+        ) AND c.id > (SELECT MAX(id) - (:page * 10) FROM Chats)
         ORDER BY dateTimeSend ASC
         `,
       {
         replacements: {
           sender: userId,
           receiver: idChat,
-          id : userId
+          page : Number(page)
+        },
+        type: QueryTypes.SELECT,
+      }
+    );
+    return datas;
+  } catch (error) {
+    return null;
+  }
+};
+
+let getApiChatBetweenUsersForDelete = (userId, idChat) => {
+  try {
+    let datas = sequelize.query(
+      `SELECT c.id FROM Chats AS c
+      WHERE (c.sender = :sender AND c.receiver = :receiver OR c.sender = :receiver AND c.receiver = :sender)
+      AND c.dateTimeSend NOT IN (
+          SELECT c.dateTimeSend FROM Chats AS c 
+          INNER JOIN Status_Chat AS stc ON c.id = stc.chat
+          WHERE (c.sender = :sender AND c.receiver = :receiver OR c.sender = :receiver AND c.receiver = :sender)
+          AND if(stc.implementer = :sender, 1, 0) OR stc.status = 'recalls'
+      )
+      ORDER BY dateTimeSend ASC`,
+      {
+        replacements: {
+          sender: userId,
+          receiver: idChat,
         },
         type: QueryTypes.SELECT,
       }
@@ -96,4 +121,5 @@ module.exports = {
   findById,
   deleteById,
   getApiChatBetweenUsers,
+  getApiChatBetweenUsersForDelete
 };
