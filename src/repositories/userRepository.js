@@ -405,7 +405,13 @@ let getApiChatsFinalByUserIdAndChatId = async (id, chatId) => {
 let checkIsFriendByUserId = async (userId, friendId) => {
   try {
     let data = await sequelize.query(
-      `SELECT JSON_CONTAINS(relationships, '{"friends": [${friendId}]}') AS isFriends FROM Users WHERE id = ${userId}`,
+      `SELECT mf.id,
+      CASE 
+          WHEN mf.recipient = ${friendId} THEN 'Đã gửi lời mời kết bạn'
+          WHEN JSON_CONTAINS(relationships, '{"friends": [${friendId}]}') THEN '1'
+          ELSE '0'
+      END AS isFriends
+      FROM Users AS u INNER JOIN Make_Friends AS mf ON u.id = mf.giver WHERE mf.giver = ${userId}`,
       {
         type: QueryTypes.SELECT,
       }
@@ -431,5 +437,5 @@ module.exports = {
   getApiChatsFinalByUserIdAndChatId,
   updateFriendsRelationships,
   updateBlockRelationships,
-  checkIsFriendByUserId
+  checkIsFriendByUserId,
 };

@@ -13,9 +13,9 @@ let create = async(data) => {
             },
             type : QueryTypes.INSERT
         })
-        return true
+        return await findByGiverAndRecipient(data.giver, data.recipient)
     } catch (error) {
-        return false
+        return null
     }
 }
 
@@ -44,6 +44,17 @@ let findById = async(id) => {
     }
 }
 
+let findByGiverAndRecipient = async(giver, recipient) => {
+    try {
+        let data = await sequelize.query(`SELECT * FROM Make_Friends WHERE giver = ${giver} AND recipient = ${recipient}`, {
+            type: QueryTypes.SELECT,
+        })
+        return data[0]
+    } catch (error) {
+        return null
+    }
+}
+
 let findByRecipient = async(recipient) => {
     try {
         let datas = await sequelize.query("SELECT u.id, u.name, u.image, mf.content, mf.id as makeFriendId FROM Make_Friends AS mf INNER JOIN Users AS u ON u.id = mf.giver WHERE recipient = :recipient", {
@@ -62,7 +73,7 @@ let deleteById = async(id) => {
     try {
         await sequelize.query("DELETE FROM Make_Friends WHERE id = :id", {
             replacements :{
-                id : id
+                id : Number(id)
             },
             type : QueryTypes.DELETE
         })
@@ -78,4 +89,5 @@ module.exports = {
     findById,
     deleteById,
     findByRecipient,
+    findByGiverAndRecipient
 }

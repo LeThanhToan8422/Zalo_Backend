@@ -1,6 +1,7 @@
 const { Server } = require("socket.io");
 const chatRepository = require("../repositories/chatRepository");
 const statusChatRepository = require("../repositories/statusChatRepository");
+const makeFriendsRepository = require("../repositories/makeFriendsRepository");
 const { uploadFile } = require("../service/file.service");
 const {
   updateImageAvatar,
@@ -87,6 +88,12 @@ let SocketIo = (httpServer) => {
       };
       let user = await updateImageBackground(dt);
       io.emit(`Server-update-background-${data.id}`, { data: user });
+    });
+
+    socket.on(`Client-Delete-Make-Friends`, async (data) => {
+      console.log(data);
+      let rs = await makeFriendsRepository.deleteById(data.id)
+      rs && io.emit(`Server-Delete-Make-Friends-${data.chatRoom}`, {data : true});
     });
 
     socket.on("disconnect", () => {

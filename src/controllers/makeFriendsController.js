@@ -4,7 +4,7 @@ let {
     findById,
     deleteById,
     findByRecipient,
-} = require('../repositories/makeFriendsChatRepository')
+} = require('../repositories/makeFriendsRepository')
 
 let createMethod = async(req, res) => {
     let data = await create(req.body)
