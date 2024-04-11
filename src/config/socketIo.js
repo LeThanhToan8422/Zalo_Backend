@@ -90,8 +90,12 @@ let SocketIo = (httpServer) => {
       io.emit(`Server-update-background-${data.id}`, { data: user });
     });
 
+    socket.on(`Client-Make-Friends`, async (data) => {
+      let rs = await makeFriendsRepository.create(data)
+      rs && io.emit(`Server-Make-Friends-${data.chatRoom}`, {data : rs});
+    });
+
     socket.on(`Client-Delete-Make-Friends`, async (data) => {
-      console.log(data);
       let rs = await makeFriendsRepository.deleteById(data.id)
       rs && io.emit(`Server-Delete-Make-Friends-${data.chatRoom}`, {data : true});
     });

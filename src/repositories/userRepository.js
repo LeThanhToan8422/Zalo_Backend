@@ -411,7 +411,7 @@ let checkIsFriendByUserId = async (userId, friendId) => {
           WHEN JSON_CONTAINS(relationships, '{"friends": [${friendId}]}') THEN '1'
           ELSE '0'
       END AS isFriends
-      FROM Users AS u INNER JOIN Make_Friends AS mf ON u.id = mf.giver WHERE mf.giver = ${userId}`,
+      FROM Users AS u INNER JOIN Make_Friends AS mf ON u.id = mf.giver WHERE mf.giver = ${userId} AND mf.recipient = ${friendId}`,
       {
         type: QueryTypes.SELECT,
       }
