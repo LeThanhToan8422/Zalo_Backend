@@ -15,7 +15,17 @@ module.exports = {
       members: {
         type: Sequelize.JSON
       },
+      image: {
+        type: Sequelize.STRING
+      },
       leader: {
+        type: Sequelize.INTEGER,
+        references : {
+          model : 'Users',
+          key : 'id'
+        }
+      },
+      deputy: {
         type: Sequelize.INTEGER,
         references : {
           model : 'Users',

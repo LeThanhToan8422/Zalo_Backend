@@ -18,6 +18,7 @@ let create = async (data) => {
           background: data.background
             ? data.background
             : "https://s3-dynamodb-cloudfront-20040331.s3.ap-southeast-1.amazonaws.com/backgroud.jpg",
+          relationships: JSON.stringify({ friends: [], block: [] }),
         },
         type: QueryTypes.INSERT,
       }
@@ -284,7 +285,38 @@ let getApiChatsByUserId = async (id) => {
       )`,
       {
         replacements: {
-          id: id,
+          id: Number(id),
+        },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    return datas;
+  } catch (error) {
+    return null;
+  }
+};
+
+let getApiGroupChatsByUserId = async (id) => {
+  try {
+    let datas = await sequelize.query(
+      `SELECT gr.id, gr.name, gr.members, gr.leader, gr.deputy, gr.image, c.message, c.dateTimeSend, c.sender FROM Group_Chats AS gr INNER JOIN Chats AS c ON c.groupChat = gr.id
+      WHERE JSON_CONTAINS(gr.members, :id)
+      AND c.id = (
+          SELECT id FROM Chats AS c
+          WHERE c.groupChat = gr.id AND c.id NOT IN (
+            SELECT c.id FROM Chats AS c
+            INNER JOIN Status_Chat AS st ON c.id = st.chat
+            WHERE c.groupChat = gr.id
+            AND if(st.implementer = :id, 1, 0) OR st.status = 'recalls'
+          )
+        ORDER BY c.dateTimeSend DESC
+        LIMIT 1
+      )
+      `,
+      {
+        replacements: {
+          id: Number(id),
         },
         type: QueryTypes.SELECT,
       }
@@ -429,6 +461,7 @@ module.exports = {
   findById,
   deleteById,
   getApiChatsByUserId,
+  getApiGroupChatsByUserId,
   checkPhone,
   getFriendsByIdAndName,
   updateImageAvatar,

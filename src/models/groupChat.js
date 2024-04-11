@@ -12,12 +12,14 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       GroupChat.belongsTo(models.User, {foreignKey : 'leader'})
+      GroupChat.belongsTo(models.User, {foreignKey : 'deputy'})
       GroupChat.hasMany(models.Chat, {foreignKey : 'groupChat'})
     }
   }
   GroupChat.init({
     name: DataTypes.STRING,
-    members : DataTypes.JSON
+    members : DataTypes.JSON,
+    image : DataTypes.STRING
   }, {
     sequelize,
     modelName: 'GroupChat',

@@ -6,6 +6,7 @@ let {
     findById,
     deleteById,
     getApiChatsByUserId,
+    getApiGroupChatsByUserId,
     checkPhone,
     getFriendsByIdAndName,
     getFriendsById,
@@ -54,7 +55,8 @@ let deleteByIdMethod = async(req, res) => {
 
 let getApiChatsByUserIdMethod = async(req, res) => {
     let datas = await getApiChatsByUserId(req.params.id)
-    return res.status(200).json(datas)
+    let dataGrups = await getApiGroupChatsByUserId(req.params.id)
+    return res.status(200).json([...datas,...dataGrups])
 }
 
 let checkPhoneMethod = async(req, res) => {

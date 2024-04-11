@@ -2,6 +2,7 @@ const { Server } = require("socket.io");
 const chatRepository = require("../repositories/chatRepository");
 const statusChatRepository = require("../repositories/statusChatRepository");
 const makeFriendsRepository = require("../repositories/makeFriendsRepository");
+const groupChatRepository = require("../repositories/groupChatRepository");
 const { uploadFile } = require("../service/file.service");
 const {
   updateImageAvatar,
@@ -99,6 +100,19 @@ let SocketIo = (httpServer) => {
     socket.on(`Client-Delete-Make-Friends`, async (data) => {
       let rs = await makeFriendsRepository.deleteById(data.id)
       rs && io.emit(`Server-Delete-Make-Friends-${data.chatRoom}`, {data : true});
+    });
+
+    socket.on(`Client-Group-Chats`, async (data) => {
+      let group = await groupChatRepository.create(data)
+      await chatRepository.create({
+        message: `Chào mừng đến với nhóm ${group.name}`,
+        dateTimeSend: moment().format("YYYY-MM-DD HH:mm:ss"),
+        sender: data.leader,
+        groupChat : group.id
+      })
+      for (let index = 0; index < data.members.length; index++) {
+        io.emit(`Server-Group-Chats-${data.members[index]}`, {data : group});
+      }
     });
 
     socket.on("disconnect", () => {

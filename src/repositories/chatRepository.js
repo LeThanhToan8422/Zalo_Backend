@@ -5,14 +5,15 @@ let { sequelize, Op } = require("../models/index");
 let create = async (data) => {
   try {
     await sequelize.query(
-      `INSERT INTO Chats (message, dateTimeSend, sender, receiver)
-        VALUES (:message, :dateTimeSend, :sender, :receiver)`,
+      `INSERT INTO Chats (message, dateTimeSend, sender, receiver, groupChat)
+        VALUES (:message, :dateTimeSend, :sender, :receiver, :groupChat)`,
       {
         replacements: {
           message: data.message,
           dateTimeSend: data.dateTimeSend,
           sender: data.sender,
-          receiver: data.receiver,
+          receiver: data.receiver ? data.receiver : null,
+          groupChat : data.groupChat ? data.groupChat : null
         },
         type: QueryTypes.INSERT,
       }
@@ -61,19 +62,33 @@ let deleteById = async (id) => {
   }
 };
 
-let getApiChatBetweenUsers = (userId, idChat, page) => {
+let getApiChatBetweenUsers = async(userId, idChat, page) => {
   try {
-    let datas = sequelize.query(
-      `SELECT *, IF(FIND_IN_SET(c.id, (SELECT GROUP_CONCAT(st.chat SEPARATOR ',') FROM Status_Chat AS st WHERE st.status = 'recalls')) > 0, TRUE, FALSE) AS isRecalls FROM Chats AS c
-        WHERE (c.sender = :sender AND c.receiver = :receiver OR c.sender = :receiver AND c.receiver = :sender)
-        AND c.dateTimeSend NOT IN (
-            SELECT c.dateTimeSend FROM Chats AS c 
-            INNER JOIN Status_Chat AS stc ON c.id = stc.chat
-            WHERE (c.sender = :sender AND c.receiver = :receiver OR c.sender = :receiver AND c.receiver = :sender)
-            AND if(stc.implementer = :sender, 1, 0) AND stc.status = 'delete'
-        ) AND c.id > (SELECT MAX(id) - (:page * 10) FROM Chats as c WHERE (c.sender = :sender AND c.receiver = :receiver OR c.sender = :receiver AND c.receiver = :sender))
-        ORDER BY dateTimeSend ASC
-        `,
+    let datas = await sequelize.query(
+      `
+      SELECT *, 
+          IF(FIND_IN_SET(c.id, (SELECT GROUP_CONCAT(st.chat SEPARATOR ',') FROM Status_Chat AS st WHERE st.status = 'recalls')) > 0, TRUE, FALSE) AS isRecalls 
+      FROM Chats AS c
+      WHERE (c.sender = :sender AND c.receiver = :receiver OR c.sender = :receiver AND c.receiver = :sender)
+      AND c.dateTimeSend NOT IN (
+          SELECT c1.dateTimeSend 
+          FROM Chats AS c1
+          INNER JOIN Status_Chat AS stc ON c1.id = stc.chat
+          WHERE (c1.sender = :sender AND c1.receiver = :receiver OR c1.sender = :receiver AND c1.receiver = :sender)
+          AND IF(stc.implementer = :sender, 1, 0) AND stc.status = 'delete'
+      ) 
+      AND c.id IN (
+          SELECT c2.id 
+          FROM (
+              SELECT id 
+              FROM Chats 
+              WHERE (sender = :sender AND receiver = :receiver OR sender = :receiver AND receiver = :sender) 
+              ORDER BY dateTimeSend DESC 
+              LIMIT :page
+          ) AS c2
+      )
+      ORDER BY dateTimeSend ASC;
+      `,
       {
         replacements: {
           sender: userId,
@@ -89,9 +104,9 @@ let getApiChatBetweenUsers = (userId, idChat, page) => {
   }
 };
 
-let getApiChatBetweenUsersForDelete = (userId, idChat) => {
+let getApiChatBetweenUsersForDelete = async(userId, idChat) => {
   try {
-    let datas = sequelize.query(
+    let datas = await sequelize.query(
       `SELECT c.id FROM Chats AS c
       WHERE (c.sender = :sender AND c.receiver = :receiver OR c.sender = :receiver AND c.receiver = :sender)
       AND c.dateTimeSend NOT IN (
