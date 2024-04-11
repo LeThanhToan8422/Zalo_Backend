@@ -37,6 +37,7 @@ let SocketIo = (httpServer) => {
         await chatRepository.create(data);
         io.emit(`Server-Chat-Room-${data.chatRoom}`, { data: data });
       }
+      io.emit(`Server-Chat-Room-${data.receiver}`, { data: data });
     });
 
     socket.on(`Client-Status-Chat`, async (data) => {
