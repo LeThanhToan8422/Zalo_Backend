@@ -42,7 +42,10 @@ let SocketIo = (httpServer) => {
         io.emit(`Server-Chat-Room-${data.receiver}`, { data: data });
       }
       else{
-        io.emit(`Server-Chat-Room-${data.groupChat}`, { data: data });
+        let group = await groupChatRepository.findById(data.groupChat)
+        for (let index = 0; index < group.members.length; index++) {
+          io.emit(`Server-Chat-Room-${group.members[index]}`, { data: data });
+        }
       }
     });
 

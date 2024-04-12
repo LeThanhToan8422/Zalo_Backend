@@ -34,13 +34,18 @@ let findAll = async() => {
 
 let findById = async(id) => {
     try {
-        let data = await db.GroupChat.findOne({
-            attributes : ['id', 'name', 'members', 'leader', 'deputy'],
-            where : {
-                id : id
+        let data = await sequelize.query(
+            `
+            SELECT * FROM Group_Chats WHERE id = :id
+            `,
+            {
+              replacements: {
+                id: id,
+              },
+              type: QueryTypes.SELECT,
             }
-        })
-        return data.dataValues
+          );
+        return data[0]
     } catch (error) {
         return null
     }
