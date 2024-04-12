@@ -43,7 +43,7 @@ let SocketIo = (httpServer) => {
 
     socket.on(`Client-Status-Chat`, async (data) => {
       let result = await statusChatRepository.create(data);
-      if (result) {
+      if (result && data.objectId) {
         let chatFinal = await getApiChatsFinalByUserIdAndChatId(
           data.implementer,
           data.objectId
@@ -55,6 +55,11 @@ let SocketIo = (httpServer) => {
           },
         });
       }
+      io.emit(`Server-Status-Chat-${data.chatRoom}`, {
+        data: {
+          id: data.chat,
+        },
+      });
     });
 
     socket.on(`Client-Delete-Chat`, async (data) => {

@@ -79,7 +79,7 @@ let deleteById = async(id) => {
     }
 }
 
-let getApiChatBetweenGroup = async (groupId, page) => {
+let getApiChatBetweenGroup = async (groupId, userId, page) => {
     try {
       let datas = await sequelize.query(
         `
@@ -92,6 +92,7 @@ let getApiChatBetweenGroup = async (groupId, page) => {
             FROM Chats AS c1
             INNER JOIN Status_Chat AS stc ON c1.id = stc.chat
             WHERE c1.groupChat = :groupId
+            AND IF(stc.implementer = :sender, 1, 0) AND stc.status = 'delete'
         ) 
         AND c.id IN (
             SELECT c2.id 
@@ -108,6 +109,7 @@ let getApiChatBetweenGroup = async (groupId, page) => {
         {
           replacements: {
             groupId: groupId,
+            sender: userId,
             page : Number(page)
           },
           type: QueryTypes.SELECT,

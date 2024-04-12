@@ -26,6 +26,7 @@ const FILE_TYPE_MATCH = [
   "text/plain",
   "application/vnd.ms-powerpoint",
   "application/x-zip-compressed",
+  "audio/webm;codecs=opus",
 ];
 const uploadFile = async (file) => {
   console.log(file);

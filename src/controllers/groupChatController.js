@@ -27,7 +27,7 @@ let deleteByIdMethod = async(req, res) => {
 }
 
 let getApiChatBetweenGroupMethod = async(req, res) => {
-    let data = await getApiChatBetweenGroup(req.params.groupId, req.params.page)
+    let data = await getApiChatBetweenGroup(req.params.groupId, req.params.userId, req.params.page)
     return res.status(200).json(data)
 }
 
