@@ -106,7 +106,7 @@ let SocketIo = (httpServer) => {
       let group = await groupChatRepository.create(data)
       await chatRepository.create({
         message: `Chào mừng đến với nhóm ${group.name}`,
-        dateTimeSend: moment().format("YYYY-MM-DD HH:mm:ss"),
+        dateTimeSend: moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss"),
         sender: data.leader,
         groupChat : group.id
       })
