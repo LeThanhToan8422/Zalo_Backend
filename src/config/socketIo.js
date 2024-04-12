@@ -5,6 +5,7 @@ const makeFriendsRepository = require("../repositories/makeFriendsRepository");
 const groupChatRepository = require("../repositories/groupChatRepository");
 const { uploadFile } = require("../service/file.service");
 const {
+  findById,
   updateImageAvatar,
   updateImageBackground,
   getApiChatsFinalByUserIdAndChatId,
@@ -29,14 +30,15 @@ let SocketIo = (httpServer) => {
     });
 
     socket.on(`Client-Chat-Room`, async (data) => {
+      let user = await findById(data.sender)
       if (data.message) {
         await chatRepository.create(data);
-        io.emit(`Server-Chat-Room-${data.chatRoom}`, { data: data });
+        io.emit(`Server-Chat-Room-${data.chatRoom}`, { data: {...data, name : user.name, imageUser : user.image} });
       } else if (data.file) {
         let fileUrl = await uploadFile(data.file);
         data.message = fileUrl;
         await chatRepository.create(data);
-        io.emit(`Server-Chat-Room-${data.chatRoom}`, { data: data });
+        io.emit(`Server-Chat-Room-${data.chatRoom}`, { data: {...data, name : user.name, imageUser : user.image} });
       }
       if(data.receiver){
         io.emit(`Server-Chat-Room-${data.receiver}`, { data: data });
