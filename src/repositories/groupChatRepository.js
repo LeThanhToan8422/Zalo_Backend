@@ -21,6 +21,27 @@ let create = async(data) => {
     }
 }
 
+let update = async(data) => {
+    try {
+        await sequelize.query(`UPDATE Group_Chats
+        SET name = :name, members = :members, image = :image, leader = :leader, deputy = :deputy
+        WHERE id = :id`, {
+            replacements :{
+                id : data.id,
+                name : data.name,
+                members : data.members,
+                image : data.image ? data.image : "https://s3-dynamodb-cloudfront-20040331.s3.ap-southeast-1.amazonaws.com/2own-1712558751796--IMG_0007.jpg",
+                leader : data.leader,
+                deputy : data.deputy ? data.deputy : null
+            },
+            type : QueryTypes.INSERT
+        })
+        return true
+    } catch (error) {
+        return false
+    }
+}
+
 let findAll = async() => {
     try {
         let datas = await db.GroupChat.findAll({
@@ -128,6 +149,7 @@ let getApiChatBetweenGroup = async (groupId, userId, page) => {
 
 module.exports = {
     create,
+    update,
     findAll,
     findById,
     deleteById,

@@ -11,7 +11,10 @@ let {
     getFriendsByIdAndNameMethod,
     getFriendsByIdMethod,
     updateRelationshipsMethod,
-    checkIsFriendMethod
+    checkIsFriendMethod,
+    getFriendsHaveNotJoinGroupByUserIdMethod,
+    getFriendsHaveNotJoinGroupByUserIdAndNameMethod,
+    getMembersInGroupByGroupIdMethod,
 } = require('../controllers/userController')
 
 router.get('/users', findAllMethod)
@@ -26,5 +29,8 @@ router.get('/users/friends/:id/:name', getFriendsByIdAndNameMethod)
 router.get('/users/friends/:id', getFriendsByIdMethod)
 router.get('/users/friends/:id/', getApiChatsByUserIdMethod)
 router.get('/users/check-is-friend/:userId/:friendId', checkIsFriendMethod)
+router.get('/users/get-friends-not-join-group/:userId/:groupId', getFriendsHaveNotJoinGroupByUserIdMethod)
+router.get('/users/get-friends-not-join-group/:userId/:groupId/:name', getFriendsHaveNotJoinGroupByUserIdAndNameMethod)
+router.get('/users/get-members-in-group/:groupId', getMembersInGroupByGroupIdMethod)
 
 module.exports = router

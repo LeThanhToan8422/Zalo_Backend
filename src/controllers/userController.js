@@ -12,7 +12,10 @@ let {
     getFriendsById,
     updateFriendsRelationships,
     updateBlockRelationships,
-    checkIsFriendByUserId
+    checkIsFriendByUserId,
+    getFriendsHaveNotJoinGroupByUserId,
+    getFriendsHaveNotJoinGroupByUserIdAndName,
+    getMembersInGroupByGroupId,
 } = require('../repositories/userRepository')
 const { uploadFile } = require('../service/file.service')
 
@@ -79,6 +82,21 @@ let checkIsFriendMethod = async(req, res) => {
     return res.status(200).json(data)
 }
 
+let getFriendsHaveNotJoinGroupByUserIdMethod = async(req, res) => {
+    let datas = await getFriendsHaveNotJoinGroupByUserId(req.params.userId, req.params.groupId)
+    return res.status(200).json(datas)
+}
+
+let getFriendsHaveNotJoinGroupByUserIdAndNameMethod = async(req, res) => {
+    let datas = await getFriendsHaveNotJoinGroupByUserIdAndName(req.params.userId, req.params.groupId, req.params.name)
+    return res.status(200).json(datas)
+}
+
+let getMembersInGroupByGroupIdMethod = async(req, res) => {
+    let datas = await getMembersInGroupByGroupId(req.params.groupId)
+    return res.status(200).json(datas)
+}
+
 module.exports = {
     createMethod,
     updateMethod,
@@ -90,5 +108,8 @@ module.exports = {
     getFriendsByIdAndNameMethod,
     getFriendsByIdMethod,
     updateRelationshipsMethod,
-    checkIsFriendMethod
+    checkIsFriendMethod,
+    getFriendsHaveNotJoinGroupByUserIdMethod,
+    getFriendsHaveNotJoinGroupByUserIdAndNameMethod,
+    getMembersInGroupByGroupIdMethod
 }

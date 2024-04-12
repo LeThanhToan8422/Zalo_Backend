@@ -454,6 +454,74 @@ let checkIsFriendByUserId = async (userId, friendId) => {
   }
 };
 
+let getFriendsHaveNotJoinGroupByUserId = async (userId, groupId) => {
+  try {
+    let datas = await sequelize.query(
+      `SELECT * FROM Users AS u
+      WHERE JSON_CONTAINS(u.relationships, '{"friends": [${userId}]}') AND u.id NOT IN (
+        SELECT u.id
+        FROM Users as u
+        JOIN Group_Chats as gr ON JSON_CONTAINS(gr.members, u.id)
+        WHERE gr.id = :groupId
+      )`,
+      {
+        replacements: {
+          groupId: groupId,
+        },
+        type: QueryTypes.SELECT,
+      }
+    );
+    return datas;
+  } catch (error) {
+    return null;
+  }
+};
+
+let getFriendsHaveNotJoinGroupByUserIdAndName = async (userId, groupId, name) => {
+  try {
+    let datas = await sequelize.query(
+      `SELECT * FROM Users AS u
+      WHERE JSON_CONTAINS(u.relationships, '{"friends": [${userId}]}') AND u.id NOT IN (
+        SELECT u.id
+        FROM Users as u
+        JOIN Group_Chats as gr ON JSON_CONTAINS(gr.members, u.id)
+        WHERE gr.id = :groupId
+      ) AND u.name LIKE '%${name}%'
+      `,
+      {
+        replacements: {
+          groupId: groupId,
+        },
+        type: QueryTypes.SELECT,
+      }
+    );
+    return datas;
+  } catch (error) {
+    return null;
+  }
+};
+
+let getMembersInGroupByGroupId = async (groupId) => {
+  try {
+    let datas = await sequelize.query(
+      `SELECT *
+      FROM Users as u
+      JOIN Group_Chats as gr ON JSON_CONTAINS(gr.members, u.id)
+      WHERE gr.id = :groupId
+      `,
+      {
+        replacements: {
+          groupId: Number(groupId),
+        },
+        type: QueryTypes.SELECT,
+      }
+    );
+    return datas;
+  } catch (error) {
+    return null;
+  }
+};
+
 module.exports = {
   create,
   update,
@@ -471,4 +539,7 @@ module.exports = {
   updateFriendsRelationships,
   updateBlockRelationships,
   checkIsFriendByUserId,
+  getFriendsHaveNotJoinGroupByUserId,
+  getFriendsHaveNotJoinGroupByUserIdAndName,
+  getMembersInGroupByGroupId
 };

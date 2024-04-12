@@ -130,6 +130,13 @@ let SocketIo = (httpServer) => {
       }
     });
 
+    socket.on(`Client-Update-Group-Chats`, async (data) => {
+      let group = await groupChatRepository.update(data.group)
+      for (let index = 0; index < data.group.members.length; index++) {
+        io.emit(`Server-Group-Chats-${data.group.members[index]}`, {data : group});
+      }
+    });
+
     socket.on("disconnect", () => {
       console.log("Client disconnected"); // Khi client disconnect thì log ra terminal.
     });
