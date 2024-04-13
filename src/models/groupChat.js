@@ -19,7 +19,8 @@ module.exports = (sequelize, DataTypes) => {
   GroupChat.init({
     name: DataTypes.STRING,
     members : DataTypes.JSON,
-    image : DataTypes.STRING
+    image : DataTypes.STRING,
+    status : DataTypes.ENUM(0,1)
   }, {
     sequelize,
     modelName: 'GroupChat',

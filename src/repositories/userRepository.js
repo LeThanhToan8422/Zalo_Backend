@@ -504,7 +504,7 @@ let getFriendsHaveNotJoinGroupByUserIdAndName = async (userId, groupId, name) =>
 let getMembersInGroupByGroupId = async (groupId) => {
   try {
     let datas = await sequelize.query(
-      `SELECT *
+      `SELECT u.id, u.name, u.image
       FROM Users as u
       JOIN Group_Chats as gr ON JSON_CONTAINS(gr.members, u.id)
       WHERE gr.id = :groupId
