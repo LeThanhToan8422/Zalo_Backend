@@ -18,6 +18,9 @@ module.exports = {
       image: {
         type: Sequelize.STRING
       },
+      status: {
+        type: Sequelize.BOOLEAN
+      },
       leader: {
         type: Sequelize.INTEGER,
         references : {

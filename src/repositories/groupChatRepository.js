@@ -4,12 +4,13 @@ let { sequelize, Op } = require('../models/index')
 
 let create = async(data) => {
     try {
-        await sequelize.query(`INSERT INTO Group_Chats (name, members, image, leader, deputy)
-        VALUES (:name, :members, :image, :leader, :deputy)`, {
+        await sequelize.query(`INSERT INTO Group_Chats (name, members, image, status, leader, deputy)
+        VALUES (:name, :members, :image, :status, :leader, :deputy)`, {
             replacements :{
                 name : data.name,
                 members : data.members,
                 image : data.image ? data.image : "https://s3-dynamodb-cloudfront-20040331.s3.ap-southeast-1.amazonaws.com/2own-1712558751796--IMG_0007.jpg",
+                status : 0,
                 leader : data.leader,
                 deputy : data.deputy ? data.deputy : null
             },
@@ -24,17 +25,63 @@ let create = async(data) => {
 let update = async(data) => {
     try {
         await sequelize.query(`UPDATE Group_Chats
-        SET name = :name, members = :members, image = :image, leader = :leader, deputy = :deputy
+        SET name = :name, members = :members, image = :image, status = :status, leader = :leader, deputy = :deputy
         WHERE id = :id`, {
             replacements :{
                 id : data.id,
                 name : data.name,
                 members : data.members,
                 image : data.image ? data.image : "https://s3-dynamodb-cloudfront-20040331.s3.ap-southeast-1.amazonaws.com/2own-1712558751796--IMG_0007.jpg",
+                status : 0,
                 leader : data.leader,
                 deputy : data.deputy ? data.deputy : null
             },
-            type : QueryTypes.INSERT
+            type : QueryTypes.UPDATE
+        })
+        return true
+    } catch (error) {
+        return false
+    }
+}
+
+let updateLeaderGroup = async(leader, id) => {
+    try {
+        await sequelize.query(`UPDATE Group_Chats SET leader = :leader WHERE id = :id`, {
+            replacements :{
+                id : id,
+                leader : leader
+            },
+            type : QueryTypes.UPDATE
+        })
+        return true
+    } catch (error) {
+        return false
+    }
+}
+
+let updateDeputyGroup = async(deputy, id) => {
+    try {
+        await sequelize.query(`UPDATE Group_Chats SET deputy = :deputy WHERE id = :id`, {
+            replacements :{
+                id : id,
+                deputy : deputy
+            },
+            type : QueryTypes.UPDATE
+        })
+        return true
+    } catch (error) {
+        return false
+    }
+}
+
+let updateStatusGroup = async(status, id) => {
+    try {
+        await sequelize.query(`UPDATE Group_Chats SET status = :status WHERE id = :id`, {
+            replacements :{
+                id : id,
+                status : status
+            },
+            type : QueryTypes.UPDATE
         })
         return true
     } catch (error) {
@@ -150,6 +197,9 @@ let getApiChatBetweenGroup = async (groupId, userId, page) => {
 module.exports = {
     create,
     update,
+    updateStatusGroup,
+    updateDeputyGroup,
+    updateLeaderGroup,
     findAll,
     findById,
     deleteById,

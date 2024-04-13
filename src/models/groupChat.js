@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.STRING,
     members : DataTypes.JSON,
     image : DataTypes.STRING,
-    status : DataTypes.ENUM(0,1)
+    status : DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'GroupChat',

@@ -312,7 +312,7 @@ let getApiGroupChatsByUserId = async (id) => {
           )
         ORDER BY c.dateTimeSend DESC
         LIMIT 1
-      )
+      ) AND gr.status = 0
       `,
       {
         replacements: {
