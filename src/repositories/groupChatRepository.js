@@ -44,6 +44,22 @@ let update = async(data) => {
     }
 }
 
+let updateNameAndImageGroup = async(name, image, id) => {
+    try {
+        await sequelize.query(`UPDATE Group_Chats SET name = :name, image = :image WHERE id = :id`, {
+            replacements :{
+                id : id,
+                name : name,
+                image : image
+            },
+            type : QueryTypes.UPDATE
+        })
+        return true
+    } catch (error) {
+        return false
+    }
+}
+
 let updateLeaderAndDeputyGroup = async(leader, deputy, id) => {
     try {
         await sequelize.query(`UPDATE Group_Chats SET leader = :leader, deputy = :deputy WHERE id = :id`, {
@@ -183,6 +199,7 @@ let getApiChatBetweenGroup = async (groupId, userId, page) => {
 module.exports = {
     create,
     update,
+    updateNameAndImageGroup,
     updateStatusGroup,
     updateLeaderAndDeputyGroup,
     findAll,

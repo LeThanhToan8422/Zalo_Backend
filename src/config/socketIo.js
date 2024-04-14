@@ -46,6 +46,7 @@ let SocketIo = (httpServer) => {
       }
       if (data.receiver) {
         io.emit(`Server-Chat-Room-${data.receiver}`, { data: data });
+        io.emit(`Server-Chat-Room-${data.sender}`, { data: data });
       } else {
         let group = await groupChatRepository.findById(data.groupChat);
         for (let index = 0; index < group.members.length; index++) {
@@ -97,7 +98,7 @@ let SocketIo = (httpServer) => {
         id: data.id,
       };
       let user = await updateImageAvatar(dt);
-      io.emit(`Server-update-avatar-${data.id}`, { data: user });
+      io.emit(`Server-Reload-Page-${data.id}`, { data: user });
     });
 
     socket.on(`Client-update-background`, async (data) => {
@@ -107,7 +108,7 @@ let SocketIo = (httpServer) => {
         id: data.id,
       };
       let user = await updateImageBackground(dt);
-      io.emit(`Server-update-background-${data.id}`, { data: user });
+      io.emit(`Server-Reload-Page-${data.id}`, { data: user });
     });
 
     socket.on(`Client-Make-Friends`, async (data) => {
@@ -170,6 +171,18 @@ let SocketIo = (httpServer) => {
       io.emit(`Server-Change-Leader-And-Deputy-Group-Chats-${data.group.id}`, {
         data: data.group,
       });
+    });
+
+    socket.on(`Client-Change-Name-Or-Image-Group-Chats`, async (data) => {
+      await groupChatRepository.updateNameAndImageGroup(data.group.name, data.group.image, data.group.id);
+      io.emit(`Server-Change-Name-Or-Image-Group-Chats-${data.group.id}`, {
+        data: data.group,
+      });
+      for (let index = 0; index < data.group.members.length; index++) {
+        io.emit(`Server-Reload-Page-${data.group.members[index]}`, {
+          data: data.group,
+        });
+      }
     });
 
     socket.on("disconnect", () => {

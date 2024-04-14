@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Chat extends Model {
+  class DeletedChat extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,19 +11,16 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Chat.belongsTo(models.User, {foreignKey : 'sender'})
-      Chat.belongsTo(models.User, {foreignKey : 'receiver'})
-      Chat.belongsTo(models.GroupChat, {foreignKey : 'groupChat'})
-      Chat.hasMany(models.StatusChat, {foreignKey : 'chat'})
-      Chat.hasMany(models.DeletedChat, {foreignKey : 'chat'})
+      DeletedChat.belongsTo(models.User, {foreignKey : 'implementer'})
+      DeletedChat.belongsTo(models.Chat, {foreignKey : 'chat'})
+      DeletedChat.belongsTo(models.GroupChat, {foreignKey : 'groupChat'})
     }
   }
-  Chat.init({
-    message: DataTypes.STRING,
+  DeletedChat.init({
     dateTimeSend: DataTypes.DATE,
   }, {
     sequelize,
-    modelName: 'Chat',
+    modelName: 'DeletedChat',
   });
-  return Chat;
+  return DeletedChat;
 };
