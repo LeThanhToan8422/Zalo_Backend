@@ -9,7 +9,7 @@ let create = async(data) => {
             replacements :{
                 name : data.name,
                 members : data.members,
-                image : data.image ? data.image : "https://s3-dynamodb-cloudfront-20040331.s3.ap-southeast-1.amazonaws.com/2own-1712558751796--IMG_0007.jpg",
+                image : data.image ? data.image : "https://s3-dynamodb-cloudfront-20040331.s3.ap-southeast-1.amazonaws.com/xxcw-1713062109538--moi-dieu-can-biet-cho-con-cach-nuoi-cham-soc-va-huan-luyen-202203311033114159.jpg",
                 status : 0,
                 leader : data.leader,
                 deputy : data.deputy ? data.deputy : null
