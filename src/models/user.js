@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.MakeFriends, {foreignKey : 'giver'})
       User.hasMany(models.MakeFriends, {foreignKey : 'recipient'})
       User.hasMany(models.DeletedChat, {foreignKey : 'implementer'})
+      User.hasMany(models.DeletedChat, {foreignKey : 'chat'})
     }
   }
   User.init({

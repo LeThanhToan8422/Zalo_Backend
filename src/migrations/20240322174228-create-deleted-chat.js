@@ -22,7 +22,7 @@ module.exports = {
       chat: {
         type: Sequelize.INTEGER,
         references : {
-          model : 'Chats',
+          model : 'Users',
           key : 'id'
         }
       },

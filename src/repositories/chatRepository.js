@@ -66,28 +66,31 @@ let getApiChatBetweenUsers = async(userId, idChat, page) => {
   try {
     let datas = await sequelize.query(
       `
-      SELECT *, 
-          IF(FIND_IN_SET(c.id, (SELECT GROUP_CONCAT(st.chat SEPARATOR ',') FROM Status_Chat AS st WHERE st.status = 'recalls')) > 0, TRUE, FALSE) AS isRecalls 
+      SELECT c.*, 
+            IF(FIND_IN_SET(c.id, (SELECT GROUP_CONCAT(st.chat SEPARATOR ',') FROM Status_Chat AS st WHERE st.status = 'recalls')) > 0, TRUE, FALSE) AS isRecalls 
       FROM Chats AS c
-      WHERE (c.sender = :sender AND c.receiver = :receiver OR c.sender = :receiver AND c.receiver = :sender)
+      LEFT JOIN Deleted_Chats AS dc ON (c.sender = dc.implementer AND c.receiver = dc.chat)
+                                      OR (c.sender = dc.chat AND c.receiver = dc.implementer)
+      WHERE ((c.sender = :sender AND c.receiver = :receiver) OR (c.sender = :receiver AND c.receiver = :sender))
       AND c.dateTimeSend NOT IN (
           SELECT c1.dateTimeSend 
           FROM Chats AS c1
           INNER JOIN Status_Chat AS stc ON c1.id = stc.chat
-          WHERE (c1.sender = :sender AND c1.receiver = :receiver OR c1.sender = :receiver AND c1.receiver = :sender)
+          WHERE ((c1.sender = :sender AND c1.receiver = :receiver) OR (c1.sender = :receiver AND c1.receiver = :sender))
           AND IF(stc.implementer = :sender, 1, 0) AND stc.status = 'delete'
       ) 
       AND c.id IN (
           SELECT c2.id 
           FROM (
               SELECT id 
-              FROM Chats 
-              WHERE (sender = :sender AND receiver = :receiver OR sender = :receiver AND receiver = :sender) 
+              FROM Chats AS c
+              WHERE ((c.sender = :sender AND c.receiver = :receiver) OR (c.sender = :receiver AND c.receiver = :sender))
               ORDER BY dateTimeSend DESC 
               LIMIT :page
           ) AS c2
       )
-      ORDER BY dateTimeSend ASC;
+      AND (dc.dateTimeSend IS NULL OR c.dateTimeSend > dc.dateTimeSend)
+      ORDER BY c.dateTimeSend ASC;
       `,
       {
         replacements: {

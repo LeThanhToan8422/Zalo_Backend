@@ -1,6 +1,7 @@
 const { Server } = require("socket.io");
 const chatRepository = require("../repositories/chatRepository");
 const statusChatRepository = require("../repositories/statusChatRepository");
+const deletedChatRepository = require("../repositories/deletedChatRepository");
 const makeFriendsRepository = require("../repositories/makeFriendsRepository");
 const groupChatRepository = require("../repositories/groupChatRepository");
 const { uploadFile } = require("../service/file.service");
@@ -77,18 +78,8 @@ let SocketIo = (httpServer) => {
     });
 
     socket.on(`Client-Delete-Chat`, async (data) => {
-      let idChats = await chatRepository.getApiChatBetweenUsersForDelete(
-        data.implementer,
-        data.objectId
-      );
-      for (let i = 0; i < idChats.length; i++) {
-        let rss = await statusChatRepository.create({
-          status: "delete",
-          implementer: data.implementer,
-          chat: idChats[i].id,
-        });
-      }
-      io.emit(`Server-Delete-Chat-${data.implementer}`, { data: true });
+      await deletedChatRepository.create(data)
+      io.emit(`Server-Group-Chats-${data.implementer}`, { data: data.chat ? data.chat : data.groupChat });
     });
 
     socket.on(`Client-update-avatar`, async (data) => {

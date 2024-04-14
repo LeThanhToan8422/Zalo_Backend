@@ -270,19 +270,79 @@ let deleteById = async (id) => {
 let getApiChatsByUserId = async (id) => {
   try {
     let datas = await sequelize.query(
-      `SELECT u.id, u.name, u.gender, u.dob, u.phone, u.image, u.background, c.message, c.dateTimeSend, c.receiver, c.sender
-      FROM Users AS u INNER JOIN Chats as c ON (c.sender = u.id AND c.receiver = :id) OR (c.sender = :id AND c.receiver = u.id)
-      WHERE c.id = ( 
-        SELECT id FROM Chats AS c 
-        WHERE ((sender = u.id AND receiver = :id) OR (sender = :id AND receiver = u.id)) AND c.id NOT IN (
-          SELECT c.id FROM Chats AS c 
-          INNER JOIN Status_Chat AS st ON c.id = st.chat
-          WHERE ((sender = u.id AND receiver = :id) OR (sender = :id AND receiver = u.id))
-          AND if(st.implementer = :id, 1, 0) OR st.status = 'recalls'
-        )
-        ORDER BY c.dateTimeSend DESC
-        LIMIT 1
-      )`,
+      `
+      SELECT 
+        u.id, 
+        u.name, 
+        u.gender, 
+        u.dob, 
+        u.phone, 
+        u.image, 
+        u.background, 
+        CASE 
+            WHEN dc.dateTimeSend IS NOT NULL THEN (
+                SELECT 
+                    c1.message 
+                FROM 
+                    Chats AS c1 
+                WHERE 
+                    (c1.sender = u.id OR c1.receiver = u.id) 
+                    AND c1.dateTimeSend > dc.dateTimeSend 
+                    AND (c1.sender = :id OR c1.receiver = :id) 
+                ORDER BY 
+                    c1.dateTimeSend ASC 
+                LIMIT 1
+            )
+            ELSE c.message
+        END AS message,
+        CASE 
+            WHEN dc.dateTimeSend IS NOT NULL THEN (
+                SELECT 
+                    c2.dateTimeSend 
+                FROM 
+                    Chats AS c2 
+                WHERE 
+                    (c2.sender = u.id OR c2.receiver = u.id) 
+                    AND c2.dateTimeSend > dc.dateTimeSend 
+                    AND (c2.sender = :id OR c2.receiver = :id) 
+                ORDER BY 
+                    c2.dateTimeSend ASC 
+                LIMIT 1
+            )
+            ELSE c.dateTimeSend
+        END AS dateTimeSend,
+        c.receiver, 
+        c.sender
+    FROM 
+        Users AS u 
+    INNER JOIN 
+        Chats AS c ON (c.sender = u.id AND c.receiver = :id) OR (c.sender = :id AND c.receiver = u.id) 
+    LEFT JOIN 
+        Deleted_Chats AS dc ON (dc.implementer = u.id OR dc.chat = u.id OR dc.groupChat = u.id)
+    WHERE 
+        c.id = (
+            SELECT 
+                c.id 
+            FROM 
+                Chats AS c
+            WHERE 
+                ((c.sender = u.id AND c.receiver = :id) OR (c.sender = :id AND c.receiver = u.id)) 
+                AND c.id NOT IN (
+                    SELECT 
+                        c.id 
+                    FROM 
+                        Chats AS c 
+                    INNER JOIN 
+                        Status_Chat AS st ON c.id = st.chat
+                    WHERE 
+                        ((c.sender = u.id AND c.receiver = :id) OR (c.sender = :id AND c.receiver = u.id))
+                        AND (st.implementer = :id OR st.status = 'recalls')
+                )
+            ORDER BY 
+                c.dateTimeSend DESC
+            LIMIT 1
+        );
+      `,
       {
         replacements: {
           id: Number(id),
@@ -300,19 +360,52 @@ let getApiChatsByUserId = async (id) => {
 let getApiGroupChatsByUserId = async (id) => {
   try {
     let datas = await sequelize.query(
-      `SELECT gr.id, gr.name, gr.members, gr.leader, gr.deputy, gr.image, c.message, c.dateTimeSend, c.sender FROM Group_Chats AS gr INNER JOIN Chats AS c ON c.groupChat = gr.id
-      WHERE JSON_CONTAINS(gr.members, :id)
-      AND c.id = (
-          SELECT id FROM Chats AS c
-          WHERE c.groupChat = gr.id AND c.id NOT IN (
-            SELECT c.id FROM Chats AS c
-            INNER JOIN Status_Chat AS st ON c.id = st.chat
-            WHERE c.groupChat = gr.id
-            AND if(st.implementer = :id, 1, 0) OR st.status = 'recalls'
-          )
-        ORDER BY c.dateTimeSend DESC
-        LIMIT 1
-      ) AND gr.status = 0
+      `SELECT gr.id, gr.name, gr.members, gr.leader, gr.deputy, gr.image, 
+      CASE 
+              WHEN dc.dateTimeSend IS NOT NULL THEN (
+                  SELECT 
+                      c1.message 
+                  FROM 
+                      Chats AS c1 
+                  WHERE c1.groupChat = gr.id
+                      AND c1.dateTimeSend > dc.dateTimeSend
+                  ORDER BY 
+                      c1.dateTimeSend DESC 
+                  LIMIT 1
+              )
+              ELSE c.message
+          END AS message
+      , 
+      CASE 
+              WHEN dc.dateTimeSend IS NOT NULL THEN (
+                  SELECT 
+                      c2.dateTimeSend 
+                  FROM 
+                      Chats AS c2 
+                  WHERE c2.groupChat = gr.id
+                      AND c2.dateTimeSend > dc.dateTimeSend
+                  ORDER BY 
+                      c2.dateTimeSend DESC 
+                  LIMIT 1
+              )
+              ELSE c.dateTimeSend
+          END AS dateTimeSend, c.sender
+      FROM Group_Chats AS gr 
+      INNER JOIN Chats AS c ON c.groupChat = gr.id
+      LEFT JOIN
+          Deleted_Chats AS dc ON (dc.implementer = :id AND dc.groupChat = gr.id)
+            WHERE JSON_CONTAINS(gr.members, :id)
+            AND c.id = (
+                SELECT id FROM Chats AS c
+                WHERE c.groupChat = gr.id AND c.id NOT IN (
+                  SELECT c.id FROM Chats AS c
+                  INNER JOIN Status_Chat AS st ON c.id = st.chat
+                  WHERE c.groupChat = gr.id
+                  AND if(st.implementer = :id, 1, 0) OR st.status = 'recalls'
+                )
+              ORDER BY c.dateTimeSend DESC
+              LIMIT 1
+            ) AND gr.status = 0
       `,
       {
         replacements: {

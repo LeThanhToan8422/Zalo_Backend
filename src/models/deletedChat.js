@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       DeletedChat.belongsTo(models.User, {foreignKey : 'implementer'})
-      DeletedChat.belongsTo(models.Chat, {foreignKey : 'chat'})
+      DeletedChat.belongsTo(models.User, {foreignKey : 'chat'})
       DeletedChat.belongsTo(models.GroupChat, {foreignKey : 'groupChat'})
     }
   }

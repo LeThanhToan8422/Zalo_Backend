@@ -1,4 +1,3 @@
-const e = require('express')
 let {
     create,
     update,
@@ -59,7 +58,7 @@ let deleteByIdMethod = async(req, res) => {
 let getApiChatsByUserIdMethod = async(req, res) => {
     let datas = await getApiChatsByUserId(req.params.id)
     let dataGrups = await getApiGroupChatsByUserId(req.params.id)
-    return res.status(200).json([...datas,...dataGrups])
+    return res.status(200).json([...datas?.filter(dt => dt.message),...dataGrups?.filter(dt => dt.message)])
 }
 
 let checkPhoneMethod = async(req, res) => {

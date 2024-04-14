@@ -15,7 +15,6 @@ module.exports = (sequelize, DataTypes) => {
       Chat.belongsTo(models.User, {foreignKey : 'receiver'})
       Chat.belongsTo(models.GroupChat, {foreignKey : 'groupChat'})
       Chat.hasMany(models.StatusChat, {foreignKey : 'chat'})
-      Chat.hasMany(models.DeletedChat, {foreignKey : 'chat'})
     }
   }
   Chat.init({
