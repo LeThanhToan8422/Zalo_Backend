@@ -44,26 +44,12 @@ let update = async(data) => {
     }
 }
 
-let updateLeaderGroup = async(leader, id) => {
+let updateLeaderAndDeputyGroup = async(leader, deputy, id) => {
     try {
-        await sequelize.query(`UPDATE Group_Chats SET leader = :leader WHERE id = :id`, {
+        await sequelize.query(`UPDATE Group_Chats SET leader = :leader, deputy = :deputy WHERE id = :id`, {
             replacements :{
                 id : id,
-                leader : leader
-            },
-            type : QueryTypes.UPDATE
-        })
-        return true
-    } catch (error) {
-        return false
-    }
-}
-
-let updateDeputyGroup = async(deputy, id) => {
-    try {
-        await sequelize.query(`UPDATE Group_Chats SET deputy = :deputy WHERE id = :id`, {
-            replacements :{
-                id : id,
+                leader : leader,
                 deputy : deputy
             },
             type : QueryTypes.UPDATE
@@ -198,8 +184,7 @@ module.exports = {
     create,
     update,
     updateStatusGroup,
-    updateDeputyGroup,
-    updateLeaderGroup,
+    updateLeaderAndDeputyGroup,
     findAll,
     findById,
     deleteById,

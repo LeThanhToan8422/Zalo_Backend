@@ -167,16 +167,9 @@ let SocketIo = (httpServer) => {
       }
     });
 
-    socket.on(`Client-Change-Deputy-Group-Chats`, async (data) => {
-      await groupChatRepository.updateDeputyGroup(data.group.deputy, data.group.id);
-      io.emit(`Server-Change-Deputy-Group-Chats-${data.group.id}`, {
-        data: data.group,
-      });
-    });
-
-    socket.on(`Client-Change-Leader-Group-Chats`, async (data) => {
-      await groupChatRepository.updateLeaderGroup(data.group.leader, data.group.id);
-      io.emit(`Server-Change-Leader-Group-Chats-${data.group.id}`, {
+    socket.on(`Client-Change-Leader-And-Deputy-Group-Chats`, async (data) => {
+      await groupChatRepository.updateLeaderAndDeputyGroup(data.group.leader, data.group.deputy, data.group.id);
+      io.emit(`Server-Change-Leader-And-Deputy-Group-Chats-${data.group.id}`, {
         data: data.group,
       });
     });
