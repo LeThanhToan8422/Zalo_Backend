@@ -45,11 +45,9 @@ let SocketIo = (httpServer) => {
         });
       }
       if (data.receiver) {
-        io.emit(`Server-Chat-Room-${data.sender}`, { data: data });
         io.emit(`Server-Chat-Room-${data.receiver}`, { data: data });
       } else {
         let group = await groupChatRepository.findById(data.groupChat);
-        io.emit(`Server-Chat-Room-${group.id}`, { data: data });
         for (let index = 0; index < group.members.length; index++) {
           io.emit(`Server-Chat-Room-${group.members[index]}`, { data: data });
         }
