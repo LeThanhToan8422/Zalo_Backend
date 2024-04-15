@@ -462,7 +462,21 @@ let getFriendsByIdAndName = async (id, name) => {
         type: QueryTypes.SELECT,
       }
     );
-    return datas;
+
+    let dataGroups = await sequelize.query(
+      `SELECT gr.id, gr.name, gr.image, gr.status, gr.leader, gr.deputy FROM Group_Chats AS gr
+      WHERE JSON_CONTAINS(gr.members, :id) AND gr.status = 0 AND NAME LIKE :name
+      `,
+      {
+        replacements: {
+          id: Number(id),
+          name: `%${name}%`,
+        },
+        type: QueryTypes.SELECT,
+      }
+    );
+    
+    return [...datas, ...dataGroups];
   } catch (error) {
     return null;
   }
@@ -491,7 +505,18 @@ let getFriendsById = async (id) => {
         type: QueryTypes.SELECT,
       }
     );
-    return datas;
+
+    let dataGroups = await sequelize.query(
+      `SELECT gr.id, gr.name, gr.image, gr.status, gr.leader, gr.deputy FROM Group_Chats AS gr
+      WHERE JSON_CONTAINS(gr.members, :id) AND gr.status = 0`,
+      {
+        replacements: {
+          id: Number(id),
+        },
+        type: QueryTypes.SELECT,
+      }
+    );
+    return [...datas, ...dataGroups];
   } catch (error) {
     return null;
   }
