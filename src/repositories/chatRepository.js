@@ -5,15 +5,16 @@ let { sequelize, Op } = require("../models/index");
 let create = async (data) => {
   try {
     await sequelize.query(
-      `INSERT INTO Chats (message, dateTimeSend, sender, receiver, groupChat)
-        VALUES (:message, :dateTimeSend, :sender, :receiver, :groupChat)`,
+      `INSERT INTO Chats (message, dateTimeSend, sender, receiver, groupChat, chatReply)
+        VALUES (:message, :dateTimeSend, :sender, :receiver, :groupChat, :chatReply)`,
       {
         replacements: {
           message: data.message,
           dateTimeSend: data.dateTimeSend,
           sender: data.sender,
           receiver: data.receiver ? data.receiver : null,
-          groupChat : data.groupChat ? data.groupChat : null
+          groupChat : data.groupChat ? data.groupChat : null,
+          chatReply : data.chatReply ? data.chatReply : null,
         },
         type: QueryTypes.INSERT,
       }
@@ -67,10 +68,11 @@ let getApiChatBetweenUsers = async(userId, idChat, page) => {
     let datas = await sequelize.query(
       `
       SELECT c.*, 
-            IF(FIND_IN_SET(c.id, (SELECT GROUP_CONCAT(st.chat SEPARATOR ',') FROM Status_Chat AS st WHERE st.status = 'recalls')) > 0, TRUE, FALSE) AS isRecalls 
+            IF(FIND_IN_SET(c.id, (SELECT GROUP_CONCAT(st.chat SEPARATOR ',') FROM Status_Chat AS st WHERE st.status = 'recalls')) > 0, TRUE, FALSE) AS isRecalls, GROUP_CONCAT(e.type) AS emojis, COUNT(*) AS quantities
       FROM Chats AS c
       LEFT JOIN Deleted_Chats AS dc ON (c.sender = dc.implementer AND c.receiver = dc.chat)
                                       OR (c.sender = dc.chat AND c.receiver = dc.implementer)
+      LEFT JOIN Emotions AS e ON c.id = e.chat
       WHERE ((c.sender = :sender AND c.receiver = :receiver) OR (c.sender = :receiver AND c.receiver = :sender))
       AND c.dateTimeSend NOT IN (
           SELECT c1.dateTimeSend 
@@ -90,6 +92,7 @@ let getApiChatBetweenUsers = async(userId, idChat, page) => {
           ) AS c2
       )
       AND (dc.dateTimeSend IS NULL OR c.dateTimeSend > dc.dateTimeSend)
+      GROUP BY c.id
       ORDER BY c.dateTimeSend ASC;
       `,
       {

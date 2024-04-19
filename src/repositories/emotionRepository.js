@@ -4,10 +4,10 @@ let { sequelize, Op } = require('../models/index')
 
 let create = async(data) => {
     try {
-        await sequelize.query(`INSERT INTO Status_Chat (status, implementer, chat)
-        VALUES (:status, :implementer, :chat)`, {
+        await sequelize.query(`INSERT INTO Emotions (type, implementer, chat)
+        VALUES (:type, :implementer, :chat)`, {
             replacements :{
-                status : data.status,
+                type : data.type,
                 implementer : data.implementer,
                 chat : data.chat
             },
@@ -22,8 +22,8 @@ let create = async(data) => {
 
 let findAll = async() => {
     try {
-        let datas = await db.StatusChat.findAll({
-            attributes : ['id', 'status', 'implementer', 'chat']
+        let datas = await db.Emotion.findAll({
+            attributes : ['id', 'type', 'implementer', 'chat']
         })
         return datas
     } catch (error) {
@@ -33,8 +33,8 @@ let findAll = async() => {
 
 let findById = async(id) => {
     try {
-        let data = await db.StatusChat.findOne({
-            attributes : ['id', 'status', 'implementer', 'chat'],
+        let data = await db.Emotion.findOne({
+            attributes : ['id', 'type', 'implementer', 'chat'],
             where : {
                 id : id
             }
@@ -47,7 +47,7 @@ let findById = async(id) => {
 
 let deleteById = async(id) => {
     try {
-        await db.StatusChat.destroy({
+        await db.Emotion.destroy({
             where : {
                 id : id
             }

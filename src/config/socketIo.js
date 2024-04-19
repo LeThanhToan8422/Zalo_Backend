@@ -1,6 +1,7 @@
 const { Server } = require("socket.io");
 const chatRepository = require("../repositories/chatRepository");
 const statusChatRepository = require("../repositories/statusChatRepository");
+const emotionRepository = require("../repositories/emotionRepository");
 const deletedChatRepository = require("../repositories/deletedChatRepository");
 const makeFriendsRepository = require("../repositories/makeFriendsRepository");
 const groupChatRepository = require("../repositories/groupChatRepository");
@@ -174,6 +175,14 @@ let SocketIo = (httpServer) => {
           data: data.group,
         });
       }
+    });
+
+    socket.on(`Client-Emotion-Chats`, async (data) => {
+      console.log(data);
+      await emotionRepository.create(data);
+      io.emit(`Server-Emotion-Chats-${data.chatRoom}`, {
+        data: data,
+      });
     });
 
     socket.on("disconnect", () => {

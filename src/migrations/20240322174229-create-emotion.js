@@ -2,41 +2,24 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Chats', {
+    await queryInterface.createTable('Emotions', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      message: {
-        type: Sequelize.STRING
+      type: {
+        type: Sequelize.ENUM('like', 'love', 'haha', 'wow', 'sad', 'angry')
       },
-      dateTimeSend: {
-        type: Sequelize.DATE
-      },
-      sender: {
+      implementer: {
         type: Sequelize.INTEGER,
         references : {
           model : 'Users',
           key : 'id'
         }
       },
-      receiver: {
-        type: Sequelize.INTEGER,
-        references : {
-          model : 'Users',
-          key : 'id'
-        }
-      },
-      groupChat: {
-        type: Sequelize.INTEGER,
-        references : {
-          model : 'Group_Chats',
-          key : 'id'
-        }
-      },
-      chatReply: {
+      chat: {
         type: Sequelize.INTEGER,
         references : {
           model : 'Chats',
@@ -44,8 +27,9 @@ module.exports = {
         }
       },
     });
+    
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Chats');
+    await queryInterface.dropTable('Emotions');
   }
 };
