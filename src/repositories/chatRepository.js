@@ -68,11 +68,12 @@ let getApiChatBetweenUsers = async(userId, idChat, page) => {
     let datas = await sequelize.query(
       `
       SELECT c.*, 
-            IF(FIND_IN_SET(c.id, (SELECT GROUP_CONCAT(st.chat SEPARATOR ',') FROM Status_Chat AS st WHERE st.status = 'recalls')) > 0, TRUE, FALSE) AS isRecalls, GROUP_CONCAT(e.type) AS emojis, COUNT(*) AS quantities
+            IF(FIND_IN_SET(c.id, (SELECT GROUP_CONCAT(st.chat SEPARATOR ',') FROM Status_Chat AS st WHERE st.status = 'recalls')) > 0, TRUE, FALSE) AS isRecalls, GROUP_CONCAT(e.type) AS emojis, COUNT(*) AS quantities, u.name
       FROM Chats AS c
       LEFT JOIN Deleted_Chats AS dc ON (c.sender = dc.implementer AND c.receiver = dc.chat)
                                       OR (c.sender = dc.chat AND c.receiver = dc.implementer)
       LEFT JOIN Emotions AS e ON c.id = e.chat
+      INNER JOIN Users AS u ON u.id = c.sender
       WHERE ((c.sender = :sender AND c.receiver = :receiver) OR (c.sender = :receiver AND c.receiver = :sender))
       AND c.dateTimeSend NOT IN (
           SELECT c1.dateTimeSend 

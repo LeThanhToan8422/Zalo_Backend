@@ -58,9 +58,25 @@ let deleteById = async(id) => {
     }
 }
 
+let getEmojisByChat = async(chat) => {
+    try {
+        let datas = await sequelize.query(`SELECT u.id, u.name, u.image, GROUP_CONCAT(e.type) AS emojis FROM Users AS u INNER JOIN Emotions AS e ON u.id = e.implementer
+        WHERE e.chat = :chat`, {
+            replacements :{
+                chat : chat
+            },
+            type : QueryTypes.SELECT
+        })
+        return datas
+    } catch (error) {
+        return false
+    }
+}
+
 module.exports = {
     create,
     findAll,
     findById,
     deleteById,
+    getEmojisByChat
 }
