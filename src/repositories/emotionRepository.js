@@ -60,8 +60,9 @@ let deleteById = async(id) => {
 
 let getEmojisByChat = async(chat) => {
     try {
-        let datas = await sequelize.query(`SELECT u.id, u.name, u.image, GROUP_CONCAT(e.type) AS emojis FROM Users AS u INNER JOIN Emotions AS e ON u.id = e.implementer
-        WHERE e.chat = :chat`, {
+        let datas = await sequelize.query(`SELECT u.id, u.name, u.image, e.type, COUNT(*) AS quantities FROM Users AS u INNER JOIN Emotions AS e ON u.id = e.implementer
+        WHERE e.chat = :chat
+        GROUP BY u.id, e.type`, {
             replacements :{
                 chat : chat
             },
