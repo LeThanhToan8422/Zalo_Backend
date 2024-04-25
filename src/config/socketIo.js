@@ -178,9 +178,22 @@ let SocketIo = (httpServer) => {
     });
 
     socket.on(`Client-Emotion-Chats`, async (data) => {
-      console.log(data);
       await emotionRepository.create(data);
       io.emit(`Server-Emotion-Chats-${data.chatRoom}`, {
+        data: data,
+      });
+    });
+
+    socket.on(`Client-Video-Call`, async (data) => {
+      console.log(data);
+      io.emit(`Server-Video-Call-${data.receiver.id}`, {
+        data: data,
+      });
+    });
+
+    socket.on(`Client-Answer-Video-Call`, async (data) => {
+      console.log(data);
+      io.emit(`Server-Answer-Video-Call-${data.idZoom}`, {
         data: data,
       });
     });
