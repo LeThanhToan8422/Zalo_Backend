@@ -58,7 +58,7 @@ let deleteByIdMethod = async(req, res) => {
 let getApiChatsByUserIdMethod = async(req, res) => {
     let datas = await getApiChatsByUserId(req.params.id)
     let dataGrups = await getApiGroupChatsByUserId(req.params.id)
-    return res.status(200).json([...datas?.filter(dt => dt.message),...dataGrups?.filter(dt => dt.message)])
+    return res.status(200).json([...datas?.filter(dt => dt.message),...dataGrups?.filter(dt => dt.message)].sort((a, b) => new Date(b.dateTimeSend) - new Date(a.dateTimeSend)))
 }
 
 let checkPhoneMethod = async(req, res) => {
