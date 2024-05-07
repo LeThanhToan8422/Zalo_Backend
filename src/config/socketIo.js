@@ -237,19 +237,6 @@ let SocketIo = (httpServer) => {
       });
     });
 
-    socket.on(`Client-Video-Call`, async (data) => {
-      console.log(data);
-      io.emit(`Server-Video-Call-${data.receiver.id}`, {
-        data: data,
-      });
-    });
-
-    socket.on(`Client-Answer-Video-Call`, async (data) => {
-      io.emit(`Server-Answer-Video-Call-${data.idZoom}`, {
-        data: data,
-      });
-    });
-
     socket.on("disconnect", () => {
       console.log("Client disconnected"); // Khi client disconnect thì log ra terminal.
     });
