@@ -4,7 +4,7 @@ let { sequelize, Op } = require("../models/index");
 
 let create = async (data) => {
   try {
-    await sequelize.query(
+    const [chatID, metadata] = await sequelize.query(
       `INSERT INTO Chats (message, dateTimeSend, sender, receiver, groupChat, chatReply)
         VALUES (:message, :dateTimeSend, :sender, :receiver, :groupChat, :chatReply)`,
       {
@@ -19,9 +19,9 @@ let create = async (data) => {
         type: QueryTypes.INSERT,
       }
     );
-    return true;
+    return chatID;
   } catch (error) {
-    return false;
+    return null;
   }
 };
 

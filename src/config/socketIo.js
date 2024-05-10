@@ -34,16 +34,39 @@ let SocketIo = (httpServer) => {
     socket.on(`Client-Chat-Room`, async (data) => {
       let user = await findById(data.sender);
       if (data.message) {
-        await chatRepository.create(data);
+        const chat = await chatRepository.create(data);
         io.emit(`Server-Chat-Room-${data.chatRoom}`, {
-          data: { ...data, name: user.name, imageUser: user.image },
+          data: {
+            ...data,
+            id: chat,
+            receiver: data.receiver || null,
+            groupChat: data.groupChat || null,
+            chatRoom: data.chatRoom,
+            chatReply: null,
+            isRecalls: 0,
+            emojis: null,
+            quantities: 1,
+            name: user.name,
+            imageUser: user.image },
         });
       } else if (data.file) {
         let fileUrl = await uploadFile(data.file);
         data.message = fileUrl;
-        await chatRepository.create(data);
+        delete data.file;
+        const chat = await chatRepository.create(data);
         io.emit(`Server-Chat-Room-${data.chatRoom}`, {
-          data: { ...data, name: user.name, imageUser: user.image },
+          data: {
+            ...data,
+            id: chat,
+            receiver: data.receiver || null,
+            groupChat: data.groupChat || null,
+            chatRoom: data.chatRoom,
+            chatReply: null,
+            isRecalls: 0,
+            emojis: null,
+            quantities: 1,
+            name: user.name,
+            imageUser: user.image },
         });
       }
       if (data.receiver) {
