@@ -33,6 +33,7 @@ let SocketIo = (httpServer) => {
 
     socket.on(`Client-Chat-Room`, async (data) => {
       let user = await findById(data.sender);
+      let group = (data.groupChat) &&  await groupChatRepository.findById(data.groupChat);
       if (data.message) {
         const chat = await chatRepository.create(data);
         io.emit(`Server-Chat-Room-${data.chatRoom}`, {
@@ -41,6 +42,8 @@ let SocketIo = (httpServer) => {
             id: chat,
             receiver: data.receiver || null,
             groupChat: data.groupChat || null,
+            nameGroup: group ? group.name : null,
+            imageGroup: group ? group.image : null,
             chatRoom: data.chatRoom,
             chatReply: null,
             isRecalls: 0,
