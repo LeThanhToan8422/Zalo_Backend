@@ -178,7 +178,7 @@ let getApiChatBetweenGroup = async (groupId, userId, page) => {
                 FROM Chats 
                 WHERE groupChat = :groupId
                 ORDER BY dateTimeSend DESC 
-                LIMIT 10
+                LIMIT :page
             ) AS c2
         ) AND dc.dateTimeSend IS NULL OR c.dateTimeSend > dc.dateTimeSend
         ORDER BY dateTimeSend ASC;
