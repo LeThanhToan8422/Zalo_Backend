@@ -45,7 +45,7 @@ let SocketIo = (httpServer) => {
             nameGroup: group ? group.name : null,
             imageGroup: group ? group.image : null,
             chatRoom: data.chatRoom,
-            chatReply: null,
+            chatReply: data.chatReply || null,
             isRecalls: 0,
             emojis: null,
             quantities: 1,
@@ -85,10 +85,10 @@ let SocketIo = (httpServer) => {
 
     socket.on(`Client-Status-Chat`, async (data) => {
       let result = await statusChatRepository.create(data);
-      if (result && data.objectId) {
-        let chatFinal = await getApiChatsFinalByUserIdAndChatId(
+      if (result) {
+        const chatFinal = await getApiChatsFinalByUserIdAndChatId(
+          data.objectId,
           data.implementer,
-          data.objectId
         );
         io.emit(`Server-Status-Chat-${data.chatRoom}`, {
           data: {
@@ -97,11 +97,6 @@ let SocketIo = (httpServer) => {
           },
         });
       }
-      io.emit(`Server-Status-Chat-${data.chatRoom}`, {
-        data: {
-          id: data.chat,
-        },
-      });
     });
 
     socket.on(`Client-Delete-Chat`, async (data) => {
