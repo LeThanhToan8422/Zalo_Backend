@@ -159,10 +159,10 @@ let getApiChatBetweenGroup = async (groupId, userId, page) => {
       let datas = await sequelize.query(
         `
         SELECT c.*,gr.name AS nameGroup,gr.image AS imageGroup,gr.members, u.name,u.image AS imageUser,
-            IF(FIND_IN_SET(c.id, (SELECT GROUP_CONCAT(st.chat SEPARATOR ',') FROM Status_Chat AS st WHERE st.status = 'recalls')) > 0, TRUE, FALSE) AS isRecalls,
-            dc.dateTimeSend AS timeDeleted
+            IF(FIND_IN_SET(c.id, (SELECT GROUP_CONCAT(st.chat SEPARATOR ',') FROM Status_Chat AS st WHERE st.status = 'recalls')) > 0, TRUE, FALSE) AS isRecalls, dc.dateTimeSend AS timeDeleted, GROUP_CONCAT(e.type) AS emojis, COUNT(*) AS quantities
         FROM Chats AS c INNER JOIN Group_Chats AS gr ON gr.id = c.groupChat INNER JOIN Users AS u ON u.id = c.sender
-        LEFT JOIN Deleted_Chats AS dc ON c.groupChat = dc.groupChat AND :sender = dc.implementer
+        LEFT JOIN Deleted_Chats AS dc ON c.groupChat = dc.groupChat AND dc.implementer = :sender
+        LEFT JOIN Emotions AS e ON c.id = e.chat
         WHERE c.groupChat = :groupId
         AND c.dateTimeSend NOT IN (
             SELECT c1.dateTimeSend 
@@ -178,9 +178,10 @@ let getApiChatBetweenGroup = async (groupId, userId, page) => {
                 FROM Chats 
                 WHERE groupChat = :groupId
                 ORDER BY dateTimeSend DESC 
-                LIMIT :page
+                LIMIT 100
             ) AS c2
         ) AND dc.dateTimeSend IS NULL OR c.dateTimeSend > dc.dateTimeSend
+        GROUP BY c.id
         ORDER BY dateTimeSend ASC;
         `,
         {

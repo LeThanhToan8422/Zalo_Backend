@@ -11,6 +11,7 @@ const {
   updateImageAvatar,
   updateImageBackground,
   getApiChatsFinalByUserIdAndChatId,
+  updateRelationships
 } = require("../repositories/userRepository");
 const moment = require("moment");
 
@@ -129,6 +130,18 @@ let SocketIo = (httpServer) => {
     socket.on(`Client-Make-Friends`, async (data) => {
       let rs = await makeFriendsRepository.create(data);
       rs && io.emit(`Server-Make-Friends-${data.chatRoom}`, { data: rs });
+      rs && io.emit(`Server-Reload-Page-${data.recipient}`, { data: rs });
+    });
+
+    socket.on(`Client-Update-Friends`, async (data) => {
+      let user = await findById(data.userId)
+      let friend = await findById(data.friendId)
+      user.relationships.friends = user.relationships.friends.filter(fr => fr !== friend.id)
+      friend.relationships.friends = friend.relationships.friends.filter(fr => fr !== user.id)
+      let rs = await updateRelationships(user)
+      rs = await updateRelationships(friend)
+      io.emit(`Server-Reload-Page-${data.userId}`, { data: rs });
+      io.emit(`Server-Reload-Page-${data.friendId}`, { data: rs });
     });
 
     socket.on(`Client-Delete-Make-Friends`, async (data) => {
@@ -267,9 +280,11 @@ let SocketIo = (httpServer) => {
 
     socket.on(`Client-Emotion-Chats`, async (data) => {
       await emotionRepository.create(data);
-      io.emit(`Server-Emotion-Chats-${data.chatRoom}`, {
-        data: data,
-      });
+      for (let index = 0; index < data.members.length; index++) {
+        io.emit(`Server-Rerender-Group-Chats-${data.members[index]}`, {
+          data: data,
+        });
+      }
     });
 
     socket.on("disconnect", () => {

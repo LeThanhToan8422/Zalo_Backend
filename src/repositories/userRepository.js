@@ -51,6 +51,27 @@ let update = async (data) => {
   }
 };
 
+let updateRelationships = async (data) => {
+  console.log(data);
+  try {
+    await sequelize.query(
+      `UPDATE Users
+        SET relationships = :relationships
+        WHERE id = :id`,
+      {
+        replacements: {
+          id: data.id,
+          relationships: JSON.stringify(data.relationships),
+        },
+        type: QueryTypes.UPDATE,
+      }
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
 let updateFriendsRelationships = async (id, objectId) => {
   try {
     await sequelize.query(
@@ -240,7 +261,7 @@ let findAll = async () => {
 let findById = async (id) => {
   try {
     let data = await sequelize.query(
-      `SELECT u.id, u.name, u.gender, u.dob, a.phone, u.image, u.background FROM Users AS u INNER JOIN Accounts AS a ON u.id = a.user WHERE u.id = :id`,
+      `SELECT u.id, u.name, u.gender, u.dob, a.phone, u.image, u.background, u.relationships FROM Users AS u INNER JOIN Accounts AS a ON u.id = a.user WHERE u.id = :id`,
       {
         replacements: {
           id: id,
@@ -613,6 +634,7 @@ let getMembersInGroupByGroupId = async (groupId) => {
 module.exports = {
   create,
   update,
+  updateRelationships,
   findAll,
   findById,
   deleteById,
