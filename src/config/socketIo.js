@@ -225,14 +225,31 @@ let SocketIo = (httpServer) => {
     });
 
     socket.on(`Client-Change-Leader-And-Deputy-Group-Chats`, async (data) => {
+      let oldLeader = await findById(data.oldLeader);
+      let newLeader = null
+      let deputy = null
+      if(data.group.deputy !== null){
+        deputy = await findById(data.group.deputy)
+      }
+      else{
+        newLeader = await findById(data.group.leader)
+      }
       await groupChatRepository.updateLeaderAndDeputyGroup(
         data.group.leader,
         data.group.deputy,
         data.group.id
       );
-      io.emit(`Server-Change-Leader-And-Deputy-Group-Chats-${data.group.id}`, {
-        data: data.group,
-      });
+      await chatRepository.create({
+        message: newLeader !== null ? `${oldLeader.name} đã phân quyền ${newLeader.name} thành trưởng nhóm.` : `${oldLeader.name} đã phân quyền ${deputy.name} thành phó nhóm.`,
+        dateTimeSend: moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss"),
+        sender: data.oldLeader,
+        groupChat: data.group.id,
+      })
+      for (let index = 0; index < data.group.members.length; index++) {
+        io.emit(`Server-Rerender-Group-Chats-${data.group.members[index]}`, {
+          data: {...data.group},
+        });
+      }
     });
 
     socket.on(`Client-Change-Name-Or-Image-Group-Chats`, async (data) => {
@@ -241,12 +258,9 @@ let SocketIo = (httpServer) => {
         data.group.image,
         data.group.id
       );
-      io.emit(`Server-Change-Name-Or-Image-Group-Chats-${data.group.id}`, {
-        data: data.group,
-      });
       for (let index = 0; index < data.group.members.length; index++) {
-        io.emit(`Server-Reload-Page-${data.group.members[index]}`, {
-          data: data.group,
+        io.emit(`Server-Rerender-Group-Chats-${data.group.members[index]}`, {
+          data: {...data.group},
         });
       }
     });

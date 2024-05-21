@@ -279,38 +279,8 @@ let getApiChatsByUserId = async (id) => {
         u.phone, 
         u.image, 
         u.background, 
-        CASE 
-            WHEN dc.dateTimeSend IS NOT NULL THEN (
-                SELECT 
-                    c1.message 
-                FROM 
-                    Chats AS c1 
-                WHERE 
-                    (c1.sender = u.id OR c1.receiver = u.id) 
-                    AND c1.dateTimeSend > dc.dateTimeSend 
-                    AND (c1.sender = :id OR c1.receiver = :id) 
-                ORDER BY 
-                    c1.dateTimeSend ASC 
-                LIMIT 1
-            )
-            ELSE c.message
-        END AS message,
-        CASE 
-            WHEN dc.dateTimeSend IS NOT NULL THEN (
-                SELECT 
-                    c2.dateTimeSend 
-                FROM 
-                    Chats AS c2 
-                WHERE 
-                    (c2.sender = u.id OR c2.receiver = u.id) 
-                    AND c2.dateTimeSend > dc.dateTimeSend 
-                    AND (c2.sender = :id OR c2.receiver = :id) 
-                ORDER BY 
-                    c2.dateTimeSend ASC 
-                LIMIT 1
-            )
-            ELSE c.dateTimeSend
-        END AS dateTimeSend,
+        c.message AS message,
+        c.dateTimeSend AS dateTimeSend,
         c.receiver, 
         c.sender
     FROM 
@@ -318,7 +288,7 @@ let getApiChatsByUserId = async (id) => {
     INNER JOIN 
         Chats AS c ON (c.sender = u.id AND c.receiver = :id) OR (c.sender = :id AND c.receiver = u.id) 
     LEFT JOIN 
-        Deleted_Chats AS dc ON (dc.implementer = u.id OR dc.chat = u.id OR dc.groupChat = u.id)
+        Deleted_Chats AS dc ON (dc.implementer = :id)
     WHERE 
         c.id = (
             SELECT 
@@ -341,7 +311,7 @@ let getApiChatsByUserId = async (id) => {
             ORDER BY 
                 c.dateTimeSend DESC
             LIMIT 1
-        );
+        ) AND u.id NOT IN (SELECT chat FROM Deleted_Chats WHERE implementer = :id AND dc.dateTimeSend > c.dateTimeSend)
       `,
       {
         replacements: {
