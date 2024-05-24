@@ -10,7 +10,7 @@ let create = async (data) => {
       {
         replacements: {
           message: data.message,
-          dateTimeSend: data.dateTimeSend,
+          dateTimeSend: moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss"),
           sender: data.sender,
           receiver: data.receiver ? data.receiver : null,
           groupChat : data.groupChat ? data.groupChat : null,
