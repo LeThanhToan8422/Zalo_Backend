@@ -52,7 +52,6 @@ let update = async (data) => {
 };
 
 let updateRelationships = async (data) => {
-  console.log(data);
   try {
     await sequelize.query(
       `UPDATE Users

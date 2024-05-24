@@ -146,8 +146,6 @@ let SocketIo = (httpServer) => {
         deleteChat = await deletedChatRepository.findByImplementerAndChat(data)
       }
 
-      console.log(deleteChat);
-      
       if(!deleteChat){
         await deletedChatRepository.create(data);
       }
@@ -160,7 +158,11 @@ let SocketIo = (httpServer) => {
         }
       }
       io.emit(`Server-Group-Chats-${data.implementer}`, {
-        data: data.chat ? data.chat : data.groupChat,
+        data: {
+          id : data.chat ? data.chat : data.groupChat,
+          type : data.chat ? "Single" : "Group",
+          response : "Delete-Chat"
+        },
       });
     });
 
