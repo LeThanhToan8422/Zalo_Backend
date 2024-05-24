@@ -70,7 +70,7 @@ let getApiChatBetweenUsers = async(userId, idChat, page) => {
       SELECT c.*, 
             IF(FIND_IN_SET(c.id, (SELECT GROUP_CONCAT(st.chat SEPARATOR ',') FROM Status_Chat AS st WHERE st.status = 'recalls')) > 0, TRUE, FALSE) AS isRecalls, GROUP_CONCAT(e.type) AS emojis, COUNT(*) AS quantities, u.name
       FROM Chats AS c
-      LEFT JOIN Deleted_Chats AS dc ON dc.implementer = :sender
+      LEFT JOIN Deleted_Chats AS dc ON dc.implementer = :sender AND dc.chat = :receiver
       LEFT JOIN Emotions AS e ON c.id = e.chat
       INNER JOIN Users AS u ON u.id = c.sender
       WHERE ((c.sender = :sender AND c.receiver = :receiver) OR (c.sender = :receiver AND c.receiver = :sender))
