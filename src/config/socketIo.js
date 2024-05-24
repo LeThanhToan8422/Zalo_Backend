@@ -37,7 +37,7 @@ let SocketIo = (httpServer) => {
       let user = await findById(data.sender);
       let group = (data.groupChat) &&  await groupChatRepository.findById(data.groupChat);
 
-      if(data.message.match(
+      if(data.message?.match(
         /Bạn và(?:\s"[^"]+"|\s[^"]+|\s\w+)\sđã trở thành bạn/g
       )){
         await waitMessageRepository.create({
