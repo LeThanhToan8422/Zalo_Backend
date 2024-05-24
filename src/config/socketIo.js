@@ -326,15 +326,14 @@ let SocketIo = (httpServer) => {
       io.emit(`Server-Emotion-Chats-${data.chatRoom}`, {
         data: data,
       });
-      // for (let index = 0; index < data.members.length; index++) {
-      //   io.emit(`Server-Rerender-Group-Chats-${data.members[index]}`, {
-      //     data: data,
-      //   });
-      // }
+      for (let index = 0; index < data.members.length; index++) {
+        io.emit(`Server-Rerender-Group-Chats-${data.members[index]}`, {
+          data: data,
+        });
+      }
     });
 
     socket.on(`Client-Update-Wait-Message`, async (data) => {
-      console.log(data);
       await waitMessageRepository.update({
         id : data.id,
         dateTimeSend: moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss"),
