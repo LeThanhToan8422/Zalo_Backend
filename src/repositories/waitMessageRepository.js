@@ -30,7 +30,11 @@ let create = async (data) => {
   }
 };
 
-let updateById = async (id) => {
+let updateById = async (id, dts) => {
+  let dateTimeSend = moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss")
+  while(dts+"" > dateTimeSend+""){
+    dateTimeSend = moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss")
+  }
   try {
     await sequelize.query(
       `UPDATE Wait_Messages
@@ -39,7 +43,7 @@ let updateById = async (id) => {
       {
         replacements: {
           id: id,
-          dateTimeSend: moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss"),
+          dateTimeSend: dateTimeSend,
         },
         type: QueryTypes.UPDATE,
       }
@@ -74,7 +78,6 @@ let updateBySenderAndReceiver = async (sender, receiver) => {
 };
 
 let updateBySenderAndGroupChat = async (sender, groupChat) => {
-  console.log(sender, groupChat);
   try {
     await sequelize.query(
       `UPDATE Wait_Messages
