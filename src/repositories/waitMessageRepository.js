@@ -18,7 +18,12 @@ let create = async (data) => {
         type: QueryTypes.INSERT,
       }
     );
-    return await findBySenderAndReceiver(data.sender, data.receiver);
+    if(data.groupChat){
+      return await findBySenderAndGroupChat(data.sender, data.groupChat);
+    }
+    else{
+      return await findBySenderAndReceiver(data.sender, data.receiver);
+    }
   } catch (error) {
     console.log(error);
     return false;
