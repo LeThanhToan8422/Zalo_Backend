@@ -88,7 +88,7 @@ let getApiChatBetweenUsers = async(userId, idChat, page) => {
               FROM Chats AS c
               WHERE ((c.sender = :sender AND c.receiver = :receiver) OR (c.sender = :receiver AND c.receiver = :sender))
               ORDER BY dateTimeSend DESC 
-              LIMIT 100
+              LIMIT :page
           ) AS c2
       )
       AND (dc.dateTimeSend IS NULL OR c.dateTimeSend > dc.dateTimeSend)
