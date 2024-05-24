@@ -145,6 +145,8 @@ let SocketIo = (httpServer) => {
       else{
         deleteChat = await deletedChatRepository.findByImplementerAndChat(data)
       }
+
+      console.log(deleteChat);
       
       if(!deleteChat){
         await deletedChatRepository.create(data);

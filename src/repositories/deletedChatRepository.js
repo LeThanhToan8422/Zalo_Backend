@@ -26,13 +26,14 @@ let create = async (data) => {
 
 let updateByChat = async (data) => {
   try {
+    console.log(data);
     await sequelize.query(
       `UPDATE Deleted_Chats
           SET dateTimeSend = :dateTimeSend
           WHERE implementer = :implementer AND chat = :chat`,
       {
         replacements: {
-          dateTimeSend: moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss"),
+          dateTimeSend: data.dateTimeSend,
           implementer: data.implementer,
           chat: data.chat ? data.chat : null,
         },
@@ -53,7 +54,7 @@ let updateByGroupChat = async (data) => {
             WHERE implementer = :implementer AND groupChat = :groupChat`,
         {
           replacements: {
-            dateTimeSend: moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss"),
+            dateTimeSend: data.dateTimeSend,
             implementer: data.implementer,
             groupChat: data.groupChat ? data.groupChat : null,
           },
@@ -79,37 +80,37 @@ let findAll = async () => {
 
 let findByImplementerAndChat = async (data) => {
     try {
-        await sequelize.query(
+        let datas = await sequelize.query(
           `SELECT * FROM Deleted_Chats WHERE implementer = :implementer AND chat = :chat`,
           {
             replacements: {
               implementer: data.implementer,
               chat: data.chat ? data.chat : null,
             },
-            type: QueryTypes.UPDATE,
+            type: QueryTypes.SELECT,
           }
         );
-        return true;
+        return datas[0];
       } catch (error) {
-        return false;
+        return null;
       }
 };
 
 let findByImplementerAndGropChat = async (data) => {
     try {
-        await sequelize.query(
+        let datas = await sequelize.query(
           `SELECT * FROM Deleted_Chats WHERE implementer = :implementer AND groupChat = :groupChat`,
           {
             replacements: {
               implementer: data.implementer,
               groupChat: data.groupChat ? data.groupChat : null,
             },
-            type: QueryTypes.UPDATE,
+            type: QueryTypes.SELECT,
           }
         );
-        return true;
+        return datas[0];
       } catch (error) {
-        return false;
+        return null;
       }
 };
 

@@ -61,6 +61,11 @@ let getApiChatsByUserIdMethod = async(req, res) => {
     return res.status(200).json([...datas?.filter(dt => dt.message),...dataGrups?.filter(dt => dt.message)].sort((a, b) => new Date(b.dateTimeSend) - new Date(a.dateTimeSend)))
 }
 
+let getApiGroupChatsByUserIdMethod = async(req, res) => {
+    let datas = await getApiGroupChatsByUserId(req.params.id)
+    return res.status(200).json(datas)
+}
+
 let checkPhoneMethod = async(req, res) => {
     let data = await checkPhone(req.params.phone)
     return res.status(200).json(data)
@@ -110,5 +115,6 @@ module.exports = {
     checkIsFriendMethod,
     getFriendsHaveNotJoinGroupByUserIdMethod,
     getFriendsHaveNotJoinGroupByUserIdAndNameMethod,
-    getMembersInGroupByGroupIdMethod
+    getMembersInGroupByGroupIdMethod,
+    getApiGroupChatsByUserIdMethod
 }

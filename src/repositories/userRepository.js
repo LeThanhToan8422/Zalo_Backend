@@ -335,7 +335,7 @@ let getApiChatsByUserId = async (id) => {
             ORDER BY 
                 c.dateTimeSend DESC
             LIMIT 1
-        ) AND u.id NOT IN (SELECT chat FROM Deleted_Chats WHERE implementer = :id AND dc.dateTimeSend > c.dateTimeSend)
+        ) AND u.id NOT IN (SELECT chat FROM Deleted_Chats WHERE implementer = :id AND chat = u.id AND  dc.dateTimeSend > c.dateTimeSend)
     GROUP BY u.id
         `,
       {
