@@ -7,6 +7,7 @@ let Router = (app) => {
   app.use("/", require("./makeFriends"));
   app.use("/", require("./groupChat"));
   app.use("/", require("./emotion"));
+  app.use("/", require("./waitMessage"));
 };
 
 module.exports = {

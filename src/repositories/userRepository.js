@@ -303,13 +303,16 @@ let getApiChatsByUserId = async (id) => {
         c.message AS message,
         c.dateTimeSend AS dateTimeSend,
         c.receiver, 
-        c.sender
+        c.sender,
+        (SELECT COUNT(*) FROM Chats AS c WHERE c.sender = u.id AND c.receiver = :id AND c.dateTimeSend > wm.dateTimeSend) AS quantity
     FROM 
         Users AS u 
     INNER JOIN 
         Chats AS c ON (c.sender = u.id AND c.receiver = :id) OR (c.sender = :id AND c.receiver = u.id) 
     LEFT JOIN 
         Deleted_Chats AS dc ON (dc.implementer = :id)
+    LEFT JOIN 
+      	Wait_Messages AS wm ON wm.sender = u.id AND wm.receiver = :id
     WHERE 
         c.id = (
             SELECT 
@@ -333,7 +336,8 @@ let getApiChatsByUserId = async (id) => {
                 c.dateTimeSend DESC
             LIMIT 1
         ) AND u.id NOT IN (SELECT chat FROM Deleted_Chats WHERE implementer = :id AND dc.dateTimeSend > c.dateTimeSend)
-      `,
+    GROUP BY u.id
+        `,
       {
         replacements: {
           id: Number(id),
@@ -380,11 +384,13 @@ let getApiGroupChatsByUserId = async (id) => {
                   LIMIT 1
               )
               ELSE c.dateTimeSend
-          END AS dateTimeSend, c.sender
+          END AS dateTimeSend, c.sender,
+      (SELECT COUNT(*) FROM Chats AS c WHERE c.groupChat = gr.id AND c.dateTimeSend > wm.dateTimeSend) AS quantity
       FROM Group_Chats AS gr 
       INNER JOIN Chats AS c ON c.groupChat = gr.id
       LEFT JOIN
           Deleted_Chats AS dc ON (dc.implementer = :id AND dc.groupChat = gr.id)
+      LEFT JOIN Wait_Messages AS wm ON wm.sender = :id AND wm.groupChat = gr.id
             WHERE JSON_CONTAINS(gr.members, :id)
             AND c.id = (
                 SELECT id FROM Chats AS c
@@ -397,6 +403,7 @@ let getApiGroupChatsByUserId = async (id) => {
               ORDER BY c.dateTimeSend DESC
               LIMIT 1
             ) AND gr.status = 0
+   GROUP BY gr.id
       `,
       {
         replacements: {
@@ -466,7 +473,7 @@ let getFriendsByIdAndName = async (id, name) => {
         type: QueryTypes.SELECT,
       }
     );
-    
+
     return [...datas, ...dataGroups];
   } catch (error) {
     return null;
@@ -497,17 +504,18 @@ let getFriendsById = async (id) => {
       }
     );
 
-    let dataGroups = await sequelize.query(
-      `SELECT gr.id, gr.name, gr.image, gr.status, gr.leader, gr.deputy FROM Group_Chats AS gr
-      WHERE JSON_CONTAINS(gr.members, :id) AND gr.status = 0`,
-      {
-        replacements: {
-          id: Number(id),
-        },
-        type: QueryTypes.SELECT,
-      }
-    );
-    return [...datas, ...dataGroups];
+    // let dataGroups = await sequelize.query(
+    //   `SELECT gr.id, gr.name, gr.image, gr.status, gr.leader, gr.deputy FROM Group_Chats AS gr
+    //   WHERE JSON_CONTAINS(gr.members, :id) AND gr.status = 0`,
+    //   {
+    //     replacements: {
+    //       id: Number(id),
+    //     },
+    //     type: QueryTypes.SELECT,
+    //   }
+    // );
+    // return [...datas, ...dataGroups];
+    return datas
   } catch (error) {
     return null;
   }
@@ -586,7 +594,11 @@ let getFriendsHaveNotJoinGroupByUserId = async (userId, groupId) => {
   }
 };
 
-let getFriendsHaveNotJoinGroupByUserIdAndName = async (userId, groupId, name) => {
+let getFriendsHaveNotJoinGroupByUserIdAndName = async (
+  userId,
+  groupId,
+  name
+) => {
   try {
     let datas = await sequelize.query(
       `SELECT * FROM Users AS u
@@ -651,5 +663,5 @@ module.exports = {
   checkIsFriendByUserId,
   getFriendsHaveNotJoinGroupByUserId,
   getFriendsHaveNotJoinGroupByUserIdAndName,
-  getMembersInGroupByGroupId
+  getMembersInGroupByGroupId,
 };

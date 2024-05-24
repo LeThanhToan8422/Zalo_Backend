@@ -5,6 +5,7 @@ const emotionRepository = require("../repositories/emotionRepository");
 const deletedChatRepository = require("../repositories/deletedChatRepository");
 const makeFriendsRepository = require("../repositories/makeFriendsRepository");
 const groupChatRepository = require("../repositories/groupChatRepository");
+const waitMessageRepository = require("../repositories/waitMessageRepository");
 const { uploadFile } = require("../service/file.service");
 const {
   findById,
@@ -35,6 +36,41 @@ let SocketIo = (httpServer) => {
     socket.on(`Client-Chat-Room`, async (data) => {
       let user = await findById(data.sender);
       let group = (data.groupChat) &&  await groupChatRepository.findById(data.groupChat);
+
+      if(data.message.match(
+        /Bạn và(?:\s"[^"]+"|\s[^"]+|\s\w+)\sđã trở thành bạn/g
+      )){
+        await waitMessageRepository.create({
+          dateTimeSend: moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss"),
+          sender: data.sender,
+          receiver: data.receiver,
+          groupChat: data.groupChat,
+        })
+
+        await waitMessageRepository.create({
+          dateTimeSend: moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss"),
+          sender: data.receiver,
+          receiver: data.sender,
+          groupChat: data.groupChat,
+        })
+      }
+
+      let result = null
+      if(!data.groupChat){
+        result = await waitMessageRepository.findBySenderAndReceiver(data.sender, data.receiver)
+      } else{
+        result = await waitMessageRepository.findBySenderAndGroupChat(data.sender, data.groupChat)
+      }
+
+      if(!result){
+        result = await waitMessageRepository.create({
+          dateTimeSend: moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss"),
+          sender: data.sender,
+          receiver: data.receiver,
+          groupChat: data.groupChat,
+        })
+      }
+
       if (data.message) {
         const chat = await chatRepository.create(data);
         io.emit(`Server-Chat-Room-${data.chatRoom}`, {
@@ -73,13 +109,14 @@ let SocketIo = (httpServer) => {
             imageUser: user.image },
         });
       }
+      
       if (data.receiver) {
-        io.emit(`Server-Chat-Room-${data.receiver}`, { data: data });
-        io.emit(`Server-Chat-Room-${data.sender}`, { data: data });
+        io.emit(`Server-Chat-Room-${data.receiver}`, { data: data, waitMessage : result });
+        io.emit(`Server-Chat-Room-${data.sender}`, { data: data, waitMessage : result });
       } else {
         let group = await groupChatRepository.findById(data.groupChat);
         for (let index = 0; index < group.members.length; index++) {
-          io.emit(`Server-Chat-Room-${group.members[index]}`, { data: data });
+          io.emit(`Server-Chat-Room-${group.members[index]}`, { data: data, waitMessage : result });
         }
       }
     });
@@ -171,6 +208,12 @@ let SocketIo = (httpServer) => {
           }));
       }
       for (let index = 0; index < data.members.length; index++) {
+        await waitMessageRepository.create({
+          dateTimeSend: moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss"),
+          sender: data.members[index],
+          receiver: null,
+          groupChat: group.id,
+        })
         io.emit(`Server-Group-Chats-${data.members[index]}`, { data: group });
       }
     });
@@ -280,11 +323,25 @@ let SocketIo = (httpServer) => {
 
     socket.on(`Client-Emotion-Chats`, async (data) => {
       await emotionRepository.create(data);
-      for (let index = 0; index < data.members.length; index++) {
-        io.emit(`Server-Rerender-Group-Chats-${data.members[index]}`, {
-          data: data,
-        });
-      }
+      io.emit(`Server-Emotion-Chats-${data.chatRoom}`, {
+        data: data,
+      });
+      // for (let index = 0; index < data.members.length; index++) {
+      //   io.emit(`Server-Rerender-Group-Chats-${data.members[index]}`, {
+      //     data: data,
+      //   });
+      // }
+    });
+
+    socket.on(`Client-Update-Wait-Message`, async (data) => {
+      console.log(data);
+      await waitMessageRepository.update({
+        id : data.id,
+        dateTimeSend: moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss"),
+      });
+      // io.emit(`Server-Group-Chats-${data.implementer}`, {
+      //   data: data.chat ? data.chat : data.groupChat,
+      // });
     });
 
     socket.on("disconnect", () => {
