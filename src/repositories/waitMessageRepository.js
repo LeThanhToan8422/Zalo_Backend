@@ -31,10 +31,10 @@ let create = async (data) => {
 };
 
 let updateById = async (id, dts) => {
-  // let dateTimeSend = moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss")
-  // while(dts+"" > dateTimeSend+""){
-  //   dateTimeSend = moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss")
-  // }
+  let dtSend = moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss")
+  while(dts+"" > dtSend+""){
+    dtSend = moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss")
+  }
   try {
     await sequelize.query(
       `UPDATE Wait_Messages
@@ -43,7 +43,7 @@ let updateById = async (id, dts) => {
       {
         replacements: {
           id: id,
-          dateTimeSend: moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss"),
+          dateTimeSend: dtSend
         },
         type: QueryTypes.UPDATE,
       }
