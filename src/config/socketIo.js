@@ -326,7 +326,7 @@ let SocketIo = (httpServer) => {
       io.emit(`Server-Emotion-Chats-${data.chatRoom}`, {
         data: data,
       });
-      for (let index = 0; index < data.members.length; index++) {
+      for (let index = 0; index < data.members?.length; index++) {
         io.emit(`Server-Rerender-Group-Chats-${data.members[index]}`, {
           data: data,
         });
