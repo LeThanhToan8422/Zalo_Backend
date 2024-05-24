@@ -138,7 +138,25 @@ let SocketIo = (httpServer) => {
     });
 
     socket.on(`Client-Delete-Chat`, async (data) => {
-      await deletedChatRepository.create(data);
+      let deleteChat = null
+      if(data.groupChat){
+        deleteChat = await deletedChatRepository.findByImplementerAndGropChat(data)
+      }
+      else{
+        deleteChat = await deletedChatRepository.findByImplementerAndChat(data)
+      }
+      
+      if(!deleteChat){
+        await deletedChatRepository.create(data);
+      }
+      else{
+        if(data.groupChat){
+          await deletedChatRepository.updateByGroupChat(data)
+        }
+        else{
+          await deletedChatRepository.updateByChat(data)
+        }
+      }
       io.emit(`Server-Group-Chats-${data.implementer}`, {
         data: data.chat ? data.chat : data.groupChat,
       });
