@@ -5,9 +5,8 @@ let {
 } = require('../repositories/waitMessageRepository')
 
 let updateByIdMethod = async(req, res) => {
-    console.log(req.body);
-    let data = await updateById(req.params.id, req.body.dateTimeSend)
-    // let data = await updateById(req.params.id)
+    // let data = await updateById(req.params.id, req.body.dateTimeSend)
+    let data = await updateById(req.params.id, req.params.dateTimeSend)
     return res.status(200).json(data)
 }
 
