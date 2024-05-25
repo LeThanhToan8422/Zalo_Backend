@@ -10,7 +10,7 @@ let updateByIdMethod = async(req, res) => {
 }
 
 let updateBySenderAndReceiverMethod = async(req, res) => {
-    let data = await updateBySenderAndReceiver(req.params.sender, req.params.receiver)
+    let data = await updateBySenderAndReceiver(req.params.sender, req.params.receiver, req.params.dateTimeSend)
     return res.status(200).json(data)
 }
 

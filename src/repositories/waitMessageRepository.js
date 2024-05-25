@@ -51,7 +51,7 @@ let updateById = async (id, dateTimeSend) => {
   }
 };
 
-let updateBySenderAndReceiver = async (sender, receiver) => {
+let updateBySenderAndReceiver = async (sender, receiver, dateTimeSend) => {
   try {
     await sequelize.query(
       `UPDATE Wait_Messages
@@ -61,7 +61,7 @@ let updateBySenderAndReceiver = async (sender, receiver) => {
         replacements: {
           sender: sender,
           receiver: receiver,
-          dateTimeSend: moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss"),
+          dateTimeSend: dateTimeSend,
         },
         type: QueryTypes.UPDATE,
       }

@@ -7,7 +7,7 @@ let {
 } = require('../controllers/waitMessageController');
 
 router.post('/wait-message/update/:id/:dateTimeSend', upload, updateByIdMethod)
-router.post('/wait-message/update/:sender/:receiver', upload, updateBySenderAndReceiverMethod)
+router.post('/wait-message/update/:sender/:receiver/:dateTimeSend', upload, updateBySenderAndReceiverMethod)
 router.post('/wait-message/update/:sender/Group/:groupChat/:dateTimeSend', upload, updateBySenderAndGroupChatMethod)
 
 module.exports = router
