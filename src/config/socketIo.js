@@ -114,6 +114,7 @@ let SocketIo = (httpServer) => {
         io.emit(`Server-Chat-Room-${data.receiver}`, { data: data, waitMessage : result });
         io.emit(`Server-Chat-Room-${data.sender}`, { data: data, waitMessage : result });
       } else {
+        await waitMessageRepository.updateBySenderAndGroupChat(result.sender, result.groupChat)
         let group = await groupChatRepository.findById(data.groupChat);
         for (let index = 0; index < group.members.length; index++) {
           io.emit(`Server-Chat-Room-${group.members[index]}`, { data: data, waitMessage : result });
