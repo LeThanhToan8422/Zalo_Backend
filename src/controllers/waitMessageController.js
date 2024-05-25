@@ -15,7 +15,7 @@ let updateBySenderAndReceiverMethod = async(req, res) => {
 }
 
 let updateBySenderAndGroupChatMethod = async(req, res) => {
-    let data = await updateBySenderAndGroupChat(req.params.sender, req.params.groupChat)
+    let data = await updateBySenderAndGroupChat(req.params.sender, req.params.groupChat, req.params.dateTimeSend)
     return res.status(200).json(data)
 }
 

@@ -73,7 +73,7 @@ let updateBySenderAndReceiver = async (sender, receiver) => {
   }
 };
 
-let updateBySenderAndGroupChat = async (sender, groupChat) => {
+let updateBySenderAndGroupChat = async (sender, groupChat, dateTimeSend) => {
   try {
     await sequelize.query(
       `UPDATE Wait_Messages
@@ -83,7 +83,7 @@ let updateBySenderAndGroupChat = async (sender, groupChat) => {
         replacements: {
           sender: sender,
           groupChat: groupChat,
-          dateTimeSend: moment().utcOffset(7).format("YYYY-MM-DD HH:mm:ss"),
+          dateTimeSend: dateTimeSend,
         },
         type: QueryTypes.UPDATE,
       }
