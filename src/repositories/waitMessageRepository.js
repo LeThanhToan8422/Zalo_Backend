@@ -1,7 +1,6 @@
 const { QueryTypes } = require("sequelize");
 let db = require("../models/index");
 let { sequelize, Op } = require("../models/index");
-const moment = require("moment");
 
 let create = async (data) => {
   try {
@@ -25,7 +24,6 @@ let create = async (data) => {
       return await findBySenderAndReceiver(data.sender, data.receiver);
     }
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
@@ -46,7 +44,6 @@ let updateById = async (id, dateTimeSend) => {
     );
     return true;
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
@@ -68,7 +65,6 @@ let updateBySenderAndReceiver = async (sender, receiver, dateTimeSend) => {
     );
     return true;
   } catch (error) {
-    console.log(error);
     return false;
   }
 };
